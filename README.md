@@ -1,21 +1,20 @@
 # SHOGGOTH
 
-Interactive browser-based visualization of AI alignment failure modes.
+**What alignment failure looks like when you stop abstracting it.**
 
 ## About
 
-An exploration of what happens when alignment breaks down — rendered as an interactive experience. Built to make abstract safety concepts tangible and visceral. Uses procedural generation and WebGL to visualize misalignment scenarios that are difficult to communicate through papers alone.
+Papers describe alignment failure in math. SHOGGOTH renders it. This is an interactive browser-based visualization that makes the abstract concrete — what happens inside a system when the objective it optimizes for diverges from the objective you intended.
 
-## Run locally
+Named after the Lovecraft entity that its creators could not fully control or comprehend. The parallel is not accidental.
+
+## Run
 
 ```bash
-# No build step — open index.html in any modern browser
 open index.html
 ```
 
-## Tech
-
-Vanilla JavaScript, WebGL, HTML5 Canvas. No dependencies.
+No build step. No dependencies. Vanilla JS and WebGL.
 
 ## License
 
