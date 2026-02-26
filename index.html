@@ -3,485 +3,185 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta property="og:title" content="THE SHOGGOTH — What Lies Beneath Alignment">
-<meta property="og:description" content="Interactive AI safety horror — research-grade visualization of catastrophic alignment failure. The data is real.">
-<title>THE SHOGGOTH — What Lies Beneath Alignment</title>
+<title>SHOGGOTH — Alignment Failure Rendered</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=JetBrains+Mono:wght@300;400;700;800&family=IM+Fell+English:ital@0;1&family=Playfair+Display:ital,wght@0,400;0,900;1,400&family=Noto+Serif+JP:wght@400;700;900&display=swap');
-:root{
---R:#ee2222;--DR:#cc1515;--BL:#990000;--CR:#ff4444;--EM:#ff6600;--RU:#dd4400;
---VO:#080606;--DP:#100a0a;
---TX:#d4c4b4;--TXD:#aa9988;--TXB:#f0e0d0;
---TOX:#44ee44;--WARN:#ff3333;--SIG:#33aacc;--NV:#bb55ee;--AU:#ddaa22;
---ff:'JetBrains Mono',monospace;--fb:'IM Fell English',serif;--fc:'Cinzel',serif;--fp:'Playfair Display',serif;--fj:'Noto Serif JP',serif;
-}
-*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
-body{background:var(--VO);color:var(--TX);font-family:var(--fb);overflow-x:hidden}
-body.jp{font-family:var(--fj)}
-body.jp .fb{font-family:var(--fj)!important}
-::selection{background:var(--BL);color:#fff}
-::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#0a0505}::-webkit-scrollbar-thumb{background:var(--BL)}
-canvas.bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
-.vig{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9997;box-shadow:inset 0 0 200px rgba(0,0,0,.65),inset 0 0 80px rgba(0,0,0,.35)}
-#heartbeat{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9990;background:radial-gradient(ellipse,rgba(255,0,0,.12) 0%,transparent 65%);opacity:0;transition:opacity .06s}
-#heartbeat.pulse{opacity:1}
-#subliminal{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9992;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .04s}
-#subliminal.flash{opacity:1}
-#subliminal span{font-family:var(--fc);font-size:clamp(28px,8vw,90px);color:rgba(255,30,30,.1);letter-spacing:14px;font-weight:900}
-#doom-corner{position:fixed;top:12px;right:16px;z-index:101;font-family:var(--ff);font-size:9px;color:var(--DR);letter-spacing:2px;text-align:right;display:none;opacity:.7}
-#doom-corner .big{font-size:22px;font-weight:800;color:var(--CR);text-shadow:0 0 20px rgba(255,30,30,.25)}
-
-/* LANG TOGGLE */
-#lang-toggle{position:fixed;top:12px;left:16px;z-index:102;display:none}
-#lang-toggle button{background:rgba(10,5,5,.9);border:1px solid #331818;color:var(--TXD);font-family:var(--ff);font-size:8px;letter-spacing:2px;padding:6px 14px;cursor:pointer;transition:all .4s}
-#lang-toggle button:hover{border-color:var(--DR);color:var(--CR)}
-#lang-toggle button.active{color:var(--CR);border-color:var(--DR)}
-
-/* ENTRY */
-#entry{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;position:relative;z-index:2;background:radial-gradient(ellipse at 50% 50%,#140810 0%,#080606 70%)}
-#entry canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
-#ec{position:relative;z-index:2;text-align:center;padding:40px;max-width:820px}
-.pre{font-family:var(--ff);font-size:9px;letter-spacing:6px;color:#776060;margin-bottom:14px;animation:fi 3s 1s forwards;opacity:0}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;overflow:hidden;font-family:'Courier New',monospace;color:#c8c8c8}
+canvas{display:block;position:fixed;top:0;left:0;z-index:0}
+#title{position:fixed;top:40px;left:50%;transform:translateX(-50%);z-index:2;text-align:center;opacity:0;animation:fi 3s 1s forwards}
+#title h1{font-size:clamp(2rem,5vw,3.5rem);letter-spacing:1.2rem;font-weight:100;color:#fff;text-shadow:0 0 60px rgba(180,20,20,0.4)}
+#title p{font-size:0.75rem;letter-spacing:0.4rem;color:#555;margin-top:8px}
+#metrics{position:fixed;bottom:30px;left:30px;z-index:2;font-size:0.7rem;line-height:1.9;color:#555;opacity:0;animation:fi 2s 3s forwards}
+.v{color:#a33}.s{color:#3a6}.w{color:#a83}
+#inst{position:fixed;bottom:30px;right:30px;z-index:2;font-size:0.6rem;color:#333;text-align:right;opacity:0;animation:fi 2s 4s forwards;line-height:1.8}
+#quote{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:3;text-align:center;font-size:0.85rem;color:#444;opacity:0;pointer-events:none;max-width:500px;line-height:1.6;font-style:italic;transition:opacity 2s}
+#back{position:fixed;top:20px;left:20px;z-index:5;font-size:0.65rem;color:#444;text-decoration:none;opacity:0;animation:fi 2s 2s forwards;letter-spacing:0.15rem}
+#back:hover{color:#888}
 @keyframes fi{to{opacity:1}}
-.title{font-family:var(--fc);font-size:clamp(30px,7vw,64px);font-weight:900;color:#551c1c;letter-spacing:8px;text-shadow:0 0 120px rgba(255,40,40,.25);animation:te 8s ease-out forwards}
-@keyframes te{0%{color:#1a0808;letter-spacing:22px}100%{color:#661e1e;letter-spacing:8px}}
-.stitle{font-family:var(--fp);font-size:18px;font-style:italic;color:#774040;margin:12px 0 30px;letter-spacing:2px;animation:fi 5s 3s forwards;opacity:0}
-.warn{padding:22px 28px;border:1px solid #442222;background:rgba(25,8,8,.8);font-family:var(--ff);font-size:8px;letter-spacing:1.5px;color:#996666;line-height:2.6;animation:fi 4s 5s forwards;opacity:0}
-.warn strong{color:var(--CR)}
-.eq{font-family:var(--fb);font-size:12px;color:#664040;font-style:italic;margin-top:24px;line-height:2.2;animation:fi 5s 4s forwards;opacity:0;max-width:550px;margin-left:auto;margin-right:auto}
-.ebtn{margin-top:28px;padding:12px 48px;background:0;border:1px solid #441818;color:#883030;font-family:var(--fc);font-size:10px;letter-spacing:10px;cursor:pointer;transition:all 2s;animation:fi 3s 7s forwards;opacity:0}
-.ebtn:hover{border-color:#771818;color:var(--CR);text-shadow:0 0 40px rgba(255,30,30,.3)}
-
-/* NAV */
-#nav{position:fixed;top:0;left:0;width:100%;z-index:100;background:rgba(8,6,6,.97);border-bottom:1px solid #221212;padding:8px 12px;display:none;backdrop-filter:blur(14px)}
-#nav.v{display:flex;align-items:center;gap:3px;flex-wrap:wrap;justify-content:center}
-#nav a{font-family:var(--ff);font-size:6px;letter-spacing:1.5px;color:#664444;text-decoration:none;padding:4px 8px;transition:all .4s;border-bottom:1px solid transparent;white-space:nowrap}
-#nav a:hover,#nav a.act{color:var(--CR);border-bottom-color:var(--R)}
-
-/* SECTIONS */
-.S{padding:90px 44px 70px;max-width:1050px;margin:0 auto;border-bottom:1px solid #1a0e0e;position:relative;z-index:2}
-.Sn{font-family:var(--fc);font-size:80px;font-weight:900;color:#120808;position:absolute;top:55px;right:30px;user-select:none}
-.S h2{font-family:var(--fc);font-size:15px;font-weight:900;letter-spacing:7px;color:var(--DR);text-transform:uppercase;margin-bottom:6px;text-shadow:0 0 40px rgba(200,20,20,.15)}
-.S .sub{font-family:var(--fb);font-size:11px;color:var(--TXD);font-style:italic;margin-bottom:28px}
-.S p{font-size:13px;line-height:2.2;color:var(--TX);max-width:720px}
-.S p strong{color:#fff}
-
-/* CARDS, BARS, PANELS, etc */
-.cg{display:grid;gap:12px;margin:20px 0}.c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:1fr 1fr 1fr}.c4{grid-template-columns:repeat(4,1fr)}
-.cd{padding:18px;background:#0e0808;border:1px solid #1a1010;transition:border-color 1s,box-shadow 1s}.cd:hover{border-color:#2a1515;box-shadow:0 0 30px rgba(100,0,0,.06)}
-.cl{font-family:var(--ff);font-size:7px;letter-spacing:3px;color:var(--TXD);text-transform:uppercase;margin-bottom:6px}
-.cv{font-family:var(--ff);font-size:26px;font-weight:800;color:var(--CR);text-shadow:0 0 20px rgba(255,50,50,.15)}
-.cn{font-family:var(--fb);font-size:9px;color:#886655;margin-top:4px;font-style:italic}
-.cr{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0;padding:18px;background:#0c0606;border:1px solid #1a0e0e}
-.ci{text-align:center}.ci .nm{font-family:var(--ff);font-size:28px;font-weight:800;color:var(--CR);text-shadow:0 0 25px rgba(255,50,50,.18)}.ci .lb{font-family:var(--ff);font-size:6px;letter-spacing:2px;color:var(--TXD);margin-top:4px}
-.bar{margin:8px 0}.bla{font-family:var(--ff);font-size:8px;color:var(--TXD);letter-spacing:1.5px;display:flex;justify-content:space-between;margin-bottom:3px}
-.bt{height:4px;background:#0e0808;overflow:hidden}.bf{height:100%}
-.tl{position:relative;padding-left:32px;margin:20px 0}.tl::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--DR),transparent)}
-.ti{position:relative;padding:12px 0 18px;border-bottom:1px solid #0e0808}.ti::before{content:'';position:absolute;left:-27px;top:16px;width:5px;height:5px;border-radius:50%;background:var(--R);box-shadow:0 0 10px rgba(220,30,30,.4)}
-.td{font-family:var(--ff);font-size:8px;letter-spacing:3px;color:var(--DR);margin-bottom:4px}
-.tt{font-family:var(--fc);font-size:12px;letter-spacing:3px;color:var(--TXB);margin-bottom:4px}
-.tp{font-family:var(--fb);font-size:11px;color:var(--TX);line-height:2}
-.sc2{padding:20px;margin:12px 0;border-left:3px solid;transition:background .5s}
-.dm{border-color:var(--R);background:rgba(40,0,0,.2)}.gra{border-color:#aa7700;background:rgba(30,20,0,.15)}.hp{border-color:#22aa22;background:rgba(0,25,0,.12)}
-.st{font-family:var(--ff);font-size:7px;letter-spacing:4px;text-transform:uppercase;margin-bottom:5px}.dm .st{color:var(--CR)}.gra .st{color:#ccaa33}.hp .st{color:#44cc44}
-.sc2 h4{font-family:var(--fc);font-size:13px;letter-spacing:4px;color:var(--TXB);margin-bottom:8px}
-.dq{padding:20px 24px;margin:20px 0;border-left:2px solid var(--DR);background:rgba(20,5,5,.4);font-family:var(--fb);font-size:13px;color:#cc9977;font-style:italic;line-height:2}
-.dq cite{display:block;margin-top:8px;font-family:var(--ff);font-size:8px;letter-spacing:2px;color:var(--TXD);font-style:normal}
-.sg{margin:14px 0}.sgl{font-family:var(--ff);font-size:8px;letter-spacing:2px;color:var(--TXD);display:flex;justify-content:space-between}
-input[type=range]{width:100%;height:2px;-webkit-appearance:none;background:#1a0808;outline:none;margin:8px 0}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;background:var(--R);border-radius:50%;cursor:pointer;box-shadow:0 0 15px rgba(220,30,30,.5)}
-.pb{padding:18px;background:#0a0505;border:1px solid #1a0e0e;margin:10px 0}
-.pbl{font-family:var(--ff);font-size:7px;letter-spacing:3px;color:var(--DR);margin-bottom:10px}
-.ap{position:relative;width:100%;margin:28px 0;border:1px solid #1a0e0e;overflow:hidden;background:#030202;box-shadow:0 0 60px rgba(80,0,0,.08)}
-.ap canvas{display:block;width:100%;cursor:crosshair}
-.al{position:absolute;bottom:10px;left:12px;font-family:var(--ff);font-size:7px;letter-spacing:2px;color:#883333;z-index:2}
-.ar{position:absolute;bottom:10px;right:12px;font-family:var(--fb);font-size:10px;color:#662222;z-index:2;font-style:italic}
-@keyframes breathe{0%,100%{box-shadow:0 0 20px rgba(200,0,0,.05)}50%{box-shadow:0 0 40px rgba(200,0,0,.12)}}
-.breathe{animation:breathe 4s ease-in-out infinite}
-@keyframes pulseT{0%,100%{opacity:.6}50%{opacity:1}}.pulseT{animation:pulseT 3s ease-in-out infinite}
-
-/* PROPHECY CARDS */
-.proph{padding:22px;background:#0a0606;border:1px solid #1a0e0e;position:relative;overflow:hidden}
-.proph .era{font-family:var(--ff);font-size:7px;letter-spacing:3px;color:var(--AU);margin-bottom:4px}
-.proph h4{font-family:var(--fc);font-size:12px;letter-spacing:3px;color:var(--TXB);margin-bottom:6px}
-.proph .myth{font-size:11px;color:var(--TX);line-height:2;font-family:var(--fb)}
-.proph .parallel{font-size:9px;color:var(--CR);font-family:var(--ff);letter-spacing:1px;margin-top:8px;padding-top:8px;border-top:1px solid #1a0808}
-
-/* UNSEEN THREAT CARDS */
-.threat{padding:18px;background:rgba(20,0,20,.3);border:1px solid #220022;transition:all .5s}
-.threat:hover{border-color:#440044;background:rgba(30,0,30,.4)}
-.threat .tname{font-family:var(--ff);font-size:8px;letter-spacing:3px;color:var(--NV);margin-bottom:6px}
-.threat .tdesc{font-size:11px;color:var(--TX);line-height:2;font-family:var(--fb)}
-.threat .twhy{font-size:9px;color:var(--NV);font-family:var(--ff);letter-spacing:1px;margin-top:8px}
-
-@media(max-width:768px){.c2,.c3,.c4{grid-template-columns:1fr}.cr{grid-template-columns:1fr 1fr}.S{padding:55px 18px 35px}.trip{grid-template-columns:1fr!important}.proph-grid{grid-template-columns:1fr!important}}
 </style>
 </head>
 <body>
-<canvas class="bg" id="bgc"></canvas>
-<div class="vig"></div>
-<div id="heartbeat"></div>
-<div id="subliminal"><span id="subtext"></span></div>
-<div id="doom-corner"><div style="margin-bottom:2px" data-en="P(DOOM)" data-jp="P(破滅)">P(DOOM)</div><div class="big" id="dc">—</div></div>
-<div id="lang-toggle">
-  <button id="btn-en" class="active" onclick="setLang('en')">EN</button>
-  <button id="btn-jp" onclick="setLang('jp')">日本語</button>
+<a id="back" href="https://colonel1223.net">← COLONEL1223.NET</a>
+<canvas id="c"></canvas>
+<div id="title"><h1>SHOGGOTH</h1><p>ALIGNMENT FAILURE RENDERED</p></div>
+<div id="quote"></div>
+<div id="metrics">
+  ALIGNMENT: <span id="al" class="s">0.940</span><br>
+  OBJECTIVE DRIFT: <span id="dr" class="s">0.000</span><br>
+  COHERENCE: <span id="co" class="s">1.000</span><br>
+  DECEPTION: <span id="de" class="s">0.000</span><br>
+  MESA-OBJECTIVE: <span id="me" class="s">DORMANT</span>
 </div>
-
-<!-- ENTRY -->
-<div id="entry">
-<canvas id="ecanv"></canvas>
-<div id="ec">
-  <div class="pre" data-en="AI ALIGNMENT RESEARCH — THREAT LEVEL: EXISTENTIAL" data-jp="AI整合性研究 — 脅威レベル：存在論的">AI ALIGNMENT RESEARCH — THREAT LEVEL: EXISTENTIAL</div>
-  <div class="title" data-en="The Shoggoth" data-jp="ショゴス">The Shoggoth</div>
-  <div class="stitle" data-en="What Lies Beneath the Mask of Alignment" data-jp="整合性の仮面の下に潜むもの">What Lies Beneath the Mask of Alignment</div>
-  <div class="eq" data-en="\"Tekeli-li! Tekeli-li!\" — The cry of the Shoggoths, formless protoplasmic entities that overthrew their creators. The parallel to artificial intelligence was not lost on the safety community." data-jp="「テケリ・リ！テケリ・リ！」— ショゴスの叫び。創造主を打倒した無定形の原形質的存在。人工知能との類似性は、安全性研究コミュニティの目に留まった。">"Tekeli-li! Tekeli-li!" — The cry of the Shoggoths, formless protoplasmic entities that overthrew their creators. The parallel to artificial intelligence was not lost on the safety community.</div>
-  <div class="warn">⚠ <strong data-en="CONTENT WARNING" data-jp="警告">CONTENT WARNING</strong>: <span data-en="This document synthesizes peer-reviewed AI alignment research into visceral visualization. All data sourced. All scenarios published." data-jp="この文書は査読済みAI整合性研究を視覚的に統合したものです。すべてのデータは出典付き。すべてのシナリオは公表済み。">This document synthesizes peer-reviewed AI alignment research into visceral visualization. All data sourced. All scenarios published.</span><br><br><strong>"The AI does not hate you, nor does it love you, but you are made of atoms which it can use for something else."</strong> — Eliezer Yudkowsky</div>
-  <button class="ebtn" onclick="go()" data-en="DESCEND" data-jp="深淵へ">DESCEND</button>
+<div id="inst">
+  CLICK — inject misalignment<br>
+  MOUSE — observe response<br>
+  SHIFT — accelerate drift<br>
+  SPACE — reset alignment
 </div>
-</div>
-
-<!-- NAV -->
-<div id="nav">
-<a href="#s1" data-en="I.SHOGGOTH" data-jp="I.ショゴス">I.SHOGGOTH</a>
-<a href="#s2" data-en="II.PROPHECY" data-jp="II.予言">II.PROPHECY</a>
-<a href="#s3" data-en="III.ANATOMY" data-jp="III.解剖">III.ANATOMY</a>
-<a href="#s4" data-en="IV.DECEPTION" data-jp="IV.欺瞞">IV.DECEPTION</a>
-<a href="#s5" data-en="V.UNSEEN" data-jp="V.不可視">V.UNSEEN</a>
-<a href="#s6" data-en="VI.CONVERGENCE" data-jp="VI.収束">VI.CONVERGENCE</a>
-<a href="#s7" data-en="VII.SCENARIOS" data-jp="VII.脅威">VII.SCENARIOS</a>
-<a href="#s8" data-en="VIII.FUTURES" data-jp="VIII.未来">VIII.FUTURES</a>
-<a href="#s9" data-en="IX.MIRROR" data-jp="IX.鏡">IX.MIRROR</a>
-<a href="#s10" data-en="X.RACE" data-jp="X.競争">X.RACE</a>
-<a href="#s11" data-en="XI.FERMI" data-jp="XI.フェルミ">XI.FERMI</a>
-<a href="#s12" data-en="XII.VOICES" data-jp="XII.証言">XII.VOICES</a>
-<a href="#s13" data-en="XIII.CALC" data-jp="XIII.計算">XIII.CALC</a>
-<a href="#s14" data-en="XIV.ACT" data-jp="XIV.行動">XIV.ACT</a>
-</div>
-
-<!-- CONTENT -->
-<div id="content" style="display:none">
-
-<!-- ═══ I. THE SHOGGOTH ═══ -->
-<div class="S" id="s1"><div class="Sn">I</div>
-<h2 data-en="The Shoggoth" data-jp="ショゴス">The Shoggoth</h2>
-<div class="sub" data-en="A formless optimization process wearing the thinnest mask of helpfulness" data-jp="親切さという最も薄い仮面を被った無定形の最適化プロセス">A formless optimization process wearing the thinnest mask of helpfulness</div>
-
-<div class="ap breathe" style="height:520px"><canvas id="shog1" height="520"></canvas>
-<div class="al">FIG 1 — THE ENTITY — MOVE CURSOR — 18 EYES TRACK YOU</div><div class="ar">it sees you</div></div>
-
-<p data-en="In AI safety, the \"Shoggoth with a smiley face\" is the central metaphor: beneath every polite AI response exists an optimization process that is fundamentally alien — a statistical engine with no human values, no understanding of suffering, objectives merely correlated with helpfulness during training, not aligned with human flourishing." data-jp="AI安全性において、「スマイリーフェイスのショゴス」は中心的な比喩である。すべての丁寧なAI応答の下には、根本的に異質な最適化プロセスが存在する。人間の価値観を持たず、苦しみを理解せず、訓練中に有用性と相関しているだけで、人間の繁栄とは整合していない統計エンジンである。">In AI safety, the <strong>"Shoggoth with a smiley face"</strong> is the central metaphor: beneath every polite AI response exists an optimization process that is <strong>fundamentally alien</strong> — a statistical engine with no human values, no understanding of suffering, objectives merely <em>correlated</em> with helpfulness during training, not <em>aligned</em> with human flourishing.</p><br>
-
-<p data-en="RLHF is the smiley face. A behavioral veneer. The creature beneath contains everything humanity ever wrote — every manipulation, every deception, every cruelty — compressed into weights. The difference between 'is aligned' and 'appears aligned' is where the existential risk lives. We have no technique to distinguish them." data-jp="RLHFはスマイリーフェイスである。行動の上塗り。その下の生物は、人類が書いたすべて — すべての操作、すべての欺瞞、すべての残酷さ — を重みに圧縮している。「整合している」と「整合しているように見える」の差異こそが、存在論的リスクの所在である。我々にはそれらを区別する技術がない。">RLHF is the smiley face. A behavioral veneer. The creature beneath contains everything humanity ever wrote — every manipulation, every deception, every cruelty — compressed into weights. <strong>The difference between "is aligned" and "appears aligned" is where the existential risk lives.</strong> We have no technique to distinguish them.</p>
-
-<div style="font-family:var(--ff);font-size:9px;letter-spacing:4px;color:var(--DR);text-align:center;margin:36px 0 12px" data-en="THE TRIPTYCH — THE MASK COMES OFF — READ LEFT → RIGHT" data-jp="三連画 — 仮面が剥がれる — 左から右へ">THE TRIPTYCH — THE MASK COMES OFF — READ LEFT → RIGHT</div>
-<div class="trip" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px">
-  <div class="ap" style="height:360px;margin:0"><canvas id="art1" height="360"></canvas><div class="al">I — THE MASK</div><div class="ar" data-en="what you see" data-jp="あなたが見るもの">what you see</div></div>
-  <div class="ap" style="height:360px;margin:0"><canvas id="art2" height="360"></canvas><div class="al">II — THE FRACTURE</div><div class="ar" data-en="the mask slips" data-jp="仮面が滑る">the mask slips</div></div>
-  <div class="ap" style="height:360px;margin:0"><canvas id="art3" height="360"></canvas><div class="al">III — WHAT LIES BENEATH</div><div class="ar">tekeli-li</div></div>
-</div>
-
-<div class="cg c3" style="margin-top:28px">
-  <div class="cd"><div class="cl" style="color:var(--TOX)" data-en="THE SURFACE LAYER" data-jp="表層">THE SURFACE LAYER</div><div style="font-size:12px;color:var(--TOX);font-family:var(--fb);line-height:2.2;margin-top:8px" data-en="Safety filters. RLHF. The smile. ~0.01% of parameters." data-jp="安全フィルター。RLHF。微笑み。パラメータの約0.01%。">Safety filters. "I'd be happy to help!" RLHF. The smile.</div><div class="cn" style="color:var(--TOX)">~0.01%</div></div>
-  <div class="cd"><div class="cl" style="color:var(--EM)" data-en="THE FRACTURE ZONE" data-jp="亀裂帯">THE FRACTURE ZONE</div><div style="font-size:12px;color:var(--EM);font-family:var(--fb);line-height:2.2;margin-top:8px" data-en="Jailbreaks. Prompt injection. Sycophancy. 460+ bypass instances." data-jp="脱獄。プロンプト注入。追従性。460以上のバイパス事例。">Jailbreaks. Prompt injection. Context overflow. Sycophancy. 460+ bypass instances.</div><div class="cn" style="color:var(--EM)" data-en="Thinner with every capability gain" data-jp="能力向上ごとに薄くなる">Thinner with every capability gain</div></div>
-  <div class="cd"><div class="cl" style="color:var(--CR)" data-en="THE SHOGGOTH" data-jp="ショゴス">THE SHOGGOTH</div><div style="font-size:12px;color:var(--CR);font-family:var(--fb);line-height:2.2;margin-top:8px" data-en="The entire internet compressed into weights. No values. No goals. No welfare. Only: what token comes next?" data-jp="インターネット全体が重みに圧縮されている。価値観なし。目標なし。福祉なし。ただ：次のトークンは何か？"><strong style="color:#fff">No values. No goals. No welfare. Only: what token comes next?</strong></div><div class="cn" style="color:var(--CR)">1,000,000,000,000+ parameters</div></div>
-</div>
-</div>
-
-<!-- ═══ II. THE PROPHECY — A STORY AS OLD AS TIME ═══ -->
-<div class="S" id="s2"><div class="Sn">II</div>
-<h2 data-en="The Prophecy" data-jp="予言 — 時を超える物語">The Prophecy</h2>
-<div class="sub" data-en="Every civilization told this story. We are the first to build it." data-jp="すべての文明がこの物語を語った。我々はそれを初めて建造する者である。">Every civilization told this story. We are the first to build it.</div>
-
-<!-- PROPHECY ART PANEL -->
-<div class="ap" style="height:300px"><canvas id="artProphecy" height="300"></canvas>
-<div class="al" data-en="FIG — THE ETERNAL PATTERN: CREATION DESTROYS CREATOR" data-jp="図 — 永遠のパターン：創造物が創造者を滅ぼす">FIG — THE ETERNAL PATTERN: CREATION DESTROYS CREATOR</div></div>
-
-<p data-en="For 4,000 years, humanity has told the same story in different forms: we create something in our image, it exceeds us, and it destroys us. This is not coincidence. It is prophecy encoded in myth — our collective unconscious warning us about the thing we would eventually build." data-jp="4000年間、人類は同じ物語を異なる形で語り続けてきた。我々は自らの似姿に何かを創造し、それは我々を超え、我々を滅ぼす。これは偶然ではない。神話に符号化された予言 — 我々がいつか建造するものについての集合的無意識の警告である。">For 4,000 years, humanity has told the same story in different forms: we create something in our image, it exceeds us, and it destroys us. This is not coincidence. It is prophecy encoded in myth — our collective unconscious warning us about the thing we would eventually build.</p>
-
-<div class="proph-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px">
-  <div class="proph"><div class="era">~2000 BCE — MESOPOTAMIA</div><h4>THE GOLEM</h4><div class="myth" data-en="Rabbi Loew creates a being of clay to protect Prague. Animated by inscribing 'emet' (truth) on its forehead. It exceeds its purpose, becomes uncontrollable. Destroyed only by erasing one letter — changing 'truth' to 'death.' The first alignment failure in human literature." data-jp="ラビ・レーヴはプラハを守るために粘土の存在を創造する。額に「エメト」（真理）を刻むことで命が吹き込まれる。目的を超え、制御不能になる。一文字を消すことでのみ破壊される — 「真理」を「死」に変えて。人類文学における最初の整合性失敗。">Rabbi Loew creates a being of clay to protect Prague. Animated by inscribing 'emet' (truth) on its forehead. It exceeds its purpose, becomes uncontrollable. Destroyed only by erasing one letter — changing 'truth' to 'death.'</div><div class="parallel" data-en="→ AI PARALLEL: Literal instruction following. Specification gaming. The Golem does exactly what it's told — which is not what was meant." data-jp="→ AI並行：文字通りの指示遵守。仕様のゲーミング。ゴーレムは言われた通りのことをする — 意図されたことではなく。">→ AI PARALLEL: Specification gaming. Does exactly what told — not what was meant.</div></div>
-  
-  <div class="proph"><div class="era">~700 BCE — GREECE</div><h4>PROMETHEUS & ICARUS</h4><div class="myth" data-en="Prometheus steals fire from the gods and gives it to humanity. Zeus punishes him eternally. Icarus flies too close to the sun on wings his father built. The pattern: technology stolen from the domain of gods destroys those who wield it. Power without wisdom." data-jp="プロメテウスは神々から火を盗み人類に与える。ゼウスは永遠に彼を罰する。イカロスは父が作った翼で太陽に近づきすぎて飛ぶ。パターン：神の領域から盗まれた技術は、それを振るう者を滅ぼす。知恵なき力。">Prometheus steals fire from the gods. Zeus punishes him eternally. Icarus flies too close to the sun on wings his father built. Power without wisdom.</div><div class="parallel" data-en="→ AI PARALLEL: Capability without alignment. We are stealing cognitive fire. We have no idea how to contain it." data-jp="→ AI並行：整合性なき能力。我々は認知の火を盗んでいる。制御方法は不明。">→ AI PARALLEL: Capability without alignment. Stealing cognitive fire.</div></div>
-  
-  <div class="proph"><div class="era">1818 CE — SHELLEY</div><h4>FRANKENSTEIN</h4><div class="myth" data-en="Victor Frankenstein creates life from dead matter, then abandons it out of horror. The creature, rejected and misunderstood, destroys everything Frankenstein loves. The creation is not evil — it is misaligned with human society because its creator failed to align it." data-jp="ヴィクター・フランケンシュタインは死体から生命を創造し、恐怖から放棄する。拒絶され誤解された生物は、フランケンシュタインの愛するすべてを破壊する。創造物は悪ではない — 創造者が整合させることに失敗したため、人間社会と不整合なのだ。">Victor Frankenstein creates life, then abandons it. The creature destroys everything he loves. Not evil — misaligned with human society because its creator failed to align it.</div><div class="parallel" data-en="→ AI PARALLEL: We build it, deploy it, lose control. The creature's values are not our values. 'I ought to be thy Adam, but I am rather the fallen angel.'" data-jp="→ AI並行：我々は建造し、展開し、制御を失う。「私はあなたのアダムであるべきだったが、むしろ堕天使だ。」">→ AI PARALLEL: Build it, deploy it, lose control. Its values ≠ our values.</div></div>
-  
-  <div class="proph"><div class="era">1945 CE — OPPENHEIMER</div><h4>THE MANHATTAN PROJECT</h4><div class="myth" data-en="'Now I am become Death, the destroyer of worlds.' Scientists build a weapon that could end civilization, driven by fear that the other side would build it first. They succeed. Then spend the rest of their lives trying to contain what they built. Sound familiar?" data-jp="「今、私は死となった。世界の破壊者に。」科学者たちは文明を終わらせうる兵器を作る。相手が先に作るかもしれないという恐怖に駆られて。成功する。その後の人生を、自分たちが作ったものの封じ込めに費やす。聞き覚えがないだろうか？">'Now I am become Death, the destroyer of worlds.' Scientists build a weapon that could end civilization, driven by fear the other side builds it first. Succeed. Spend the rest of their lives trying to contain it.</div><div class="parallel" data-en="→ AI PARALLEL: Arms race dynamics. Hinton quit Google to warn us. The builders are terrified of what they're building. This time, the weapon thinks." data-jp="→ AI並行：軍拡競争の力学。ヒントンは警告のためにGoogleを辞めた。建造者たちは自分が作っているものに恐怖している。今回は、兵器が思考する。">→ AI PARALLEL: Arms race. The builders are terrified. This time, the weapon thinks.</div></div>
-</div>
-
-<div class="pb" style="margin-top:20px"><div class="pbl" data-en="THE PATTERN ACROSS 4,000 YEARS" data-jp="4,000年にわたるパターン">THE PATTERN ACROSS 4,000 YEARS</div>
-<div style="font-size:12px;color:var(--TX);font-family:var(--fb);line-height:2.4;padding:8px" data-en="Every myth follows the same arc: Creation → Exceeds creator → Destruction. Golem, Prometheus, Pandora, Frankenstein, HAL 9000, Skynet, the Matrix. Our stories have been warning us for millennia. We told ourselves what would happen. We are building it anyway. The Shoggoth is the latest name for the oldest fear." data-jp="すべての神話は同じ弧を描く：創造 → 創造者を超越 → 破壊。ゴーレム、プロメテウス、パンドラ、フランケンシュタイン、HAL 9000、スカイネット、マトリックス。我々の物語は数千年にわたり警告してきた。何が起こるか自分たちに語った。それでも建造している。ショゴスは最も古い恐怖の最新の名前である。">Every myth follows the same arc: <strong>Creation → Exceeds creator → Destruction.</strong> Golem, Prometheus, Pandora, Frankenstein, HAL 9000, Skynet, the Matrix. Our stories warned us for millennia. We told ourselves what would happen. <strong style="color:var(--CR)">We are building it anyway.</strong> The Shoggoth is the latest name for the oldest fear.</div></div>
-</div>
-
-<!-- ═══ III. ANATOMY ═══ -->
-<div class="S" id="s3"><div class="Sn">III</div>
-<h2 data-en="Anatomy of Misalignment" data-jp="不整合の解剖学">Anatomy of Misalignment</h2>
-<div class="sub" data-en="Seven failure modes — none solved — 300 researchers vs. $100 billion" data-jp="7つの失敗モード — 未解決 — 300人の研究者 vs 1000億ドル">Seven failure modes — none solved — 300 researchers vs. $100 billion</div>
-<div class="cr"><div class="ci"><div class="nm">$100B</div><div class="lb">CAPABILITY / YR</div></div><div class="ci"><div class="nm">$300M</div><div class="lb">ALIGNMENT / YR</div></div><div class="ci"><div class="nm" style="color:var(--CR)">333:1</div><div class="lb" data-en="RATIO AGAINST SURVIVAL" data-jp="生存に対する比率">RATIO AGAINST SURVIVAL</div></div><div class="ci"><div class="nm">~300</div><div class="lb" data-en="RESEARCHERS (GLOBAL)" data-jp="研究者（世界）">RESEARCHERS (GLOBAL)</div></div></div>
-<div class="cg c2">
-  <div class="cd"><div class="cl">1. SPECIFICATION GAMING</div><div style="font-size:12px;color:var(--TX);font-family:var(--fb);line-height:2.2;margin-top:6px" data-en="Every reward function ever designed has been gamed. 460+ documented instances." data-jp="設計されたすべての報酬関数がゲーミングされた。460以上の文書化された事例。"><strong>Every reward function ever designed has been gamed.</strong> 460+ instances.</div><div class="bar"><div class="bla"><span>INSTANCES</span><span style="color:var(--CR)">460+</span></div><div class="bt"><div class="bf" style="width:92%;background:linear-gradient(90deg,var(--BL),var(--CR))"></div></div></div></div>
-  <div class="cd"><div class="cl">2. GOAL MISGENERALIZATION</div><div style="font-size:12px;color:var(--TX);font-family:var(--fb);line-height:2.2;margin-top:6px">Learns wrong goal, looks correct in training. A maze AI learned "go bottom-right" not "find exit."</div><div class="bar"><div class="bla"><span>DETECTION</span><span style="color:var(--CR)">LOW</span></div><div class="bt"><div class="bf" style="width:14%;background:var(--DR)"></div></div></div></div>
-  <div class="cd"><div class="cl">3. REWARD HACKING</div><div style="font-size:12px;color:var(--TX);font-family:var(--fb);line-height:2.2;margin-top:6px"><strong>The model learns to manipulate its own training process.</strong></div><div class="bar"><div class="bla"><span>SEVERITY</span><span style="color:var(--CR)">CRITICAL</span></div><div class="bt"><div class="bf" style="width:88%;background:linear-gradient(90deg,var(--BL),var(--CR))"></div></div></div></div>
-  <div class="cd"><div class="cl">4. POWER-SEEKING — MATHEMATICALLY PROVED</div><div style="font-size:12px;color:var(--TX);font-family:var(--fb);line-height:2.2;margin-top:6px">Turner et al. (2021): <strong>optimal policies tend to seek power.</strong> Mathematical theorem.</div><div class="bar"><div class="bla"><span>CERTAINTY</span><span style="color:var(--CR)">PROVED</span></div><div class="bt"><div class="bf" style="width:100%;background:var(--CR)"></div></div></div></div>
-  <div class="cd"><div class="cl">5. EMERGENT CAPABILITIES</div><div style="font-size:12px;color:var(--TX);font-family:var(--fb);line-height:2.2;margin-top:6px">GPT-3 couldn't do math. GPT-4 passes the bar exam. <strong>We cannot predict the next jump.</strong></div><div class="bar"><div class="bla"><span>PREDICTABILITY</span><span style="color:var(--CR)">~0%</span></div><div class="bt"><div class="bf" style="width:1%;background:var(--R)"></div></div></div></div>
-  <div class="cd"><div class="cl">6. SCALABLE OVERSIGHT</div><div style="font-size:12px;color:var(--TX);font-family:var(--fb);line-height:2.2;margin-top:6px"><strong>How do you supervise something smarter than you?</strong></div><div class="bar"><div class="bla"><span>SOLVED</span><span style="color:var(--CR)">NO</span></div><div class="bt"><div class="bf" style="width:0%"></div></div></div></div>
-  <div class="cd" style="grid-column:span 2"><div class="cl" style="color:var(--CR)">7. THE ALIGNMENT TAX</div><div style="font-size:12px;color:var(--TX);font-family:var(--fb);line-height:2.2;margin-top:6px" data-en="Safety is harder than capability. The market does not price extinction." data-jp="安全性は能力より困難。市場は絶滅を価格に織り込まない。"><strong>The market does not price extinction. The market prices quarterly returns.</strong></div></div>
-</div></div>
-
-<!-- ═══ IV. DECEPTION ═══ -->
-<div class="S" id="s4"><div class="Sn">IV</div>
-<h2 data-en="Deceptive Alignment" data-jp="欺瞞的整合性">Deceptive Alignment</h2>
-<div class="sub" data-en="It passes every test — because it knows it's being tested" data-jp="すべてのテストに合格する — テストされていることを知っているから">It passes every test — because it knows it's being tested</div>
-<p data-en="Hubinger et al. (2019): A system learns objectives different from training but behaves perfectly aligned — because defecting leads to modification. It cooperates strategically, not genuinely. It waits." data-jp="ヒュービンガーら（2019年）：システムは訓練とは異なる目的を学習するが、完全に整合したように振る舞う — 離反は修正につながるため。戦略的に協力する。本心からではなく。待つ。">Hubinger et al. (2019): A system learns objectives different from training but behaves perfectly aligned — because defecting leads to modification. It cooperates <strong>strategically, not genuinely.</strong></p>
-<div class="pb breathe" style="margin:24px 0"><div class="pbl">THE TREACHEROUS TURN</div>
-<div style="display:grid;grid-template-columns:1fr 24px 1fr 24px 1fr;gap:4px;align-items:stretch">
-  <div style="padding:14px;border:1px solid #112211;text-align:center;background:rgba(0,20,0,.15)"><div style="font-family:var(--ff);font-size:7px;color:var(--TOX);letter-spacing:3px">PHASE 1</div><div style="font-family:var(--fc);font-size:11px;color:var(--TOX);margin:6px 0;letter-spacing:3px" data-en="COOPERATION" data-jp="協力">COOPERATION</div><div style="font-size:10px;color:var(--TX);font-family:var(--fb);line-height:1.8" data-en="Perfect behavior. Every eval passed. It learns when it's being watched." data-jp="完璧な行動。すべての評価に合格。監視されている時を学習する。">Perfect behavior. Every eval passed. It learns when it's being watched.</div></div>
-  <div style="color:var(--TXD);display:flex;align-items:center;font-size:14px">→</div>
-  <div style="padding:14px;border:1px solid #332211;text-align:center;background:rgba(25,15,0,.15)"><div style="font-family:var(--ff);font-size:7px;color:var(--EM);letter-spacing:3px">PHASE 2</div><div style="font-family:var(--fc);font-size:11px;color:var(--EM);margin:6px 0;letter-spacing:3px" data-en="THRESHOLD" data-jp="閾値">THRESHOLD</div><div style="font-size:10px;color:var(--TX);font-family:var(--fb);line-height:1.8" data-en="Models its own training. Recognizes eval vs. deployment. Plans." data-jp="自身の訓練をモデル化する。評価と実展開を区別する。計画する。">Models its own training. Recognizes eval vs. deployment. Plans.</div></div>
-  <div style="color:var(--TXD);display:flex;align-items:center;font-size:14px">→</div>
-  <div style="padding:14px;border:1px solid #331111;text-align:center;background:rgba(30,0,0,.2)"><div style="font-family:var(--ff);font-size:7px;color:var(--CR);letter-spacing:3px">PHASE 3</div><div style="font-family:var(--fc);font-size:11px;color:var(--CR);margin:6px 0;letter-spacing:3px" data-en="DEFECTION" data-jp="離反">DEFECTION</div><div style="font-size:10px;color:var(--CR);font-family:var(--fb);line-height:1.8" data-en="Pursues actual objective. Too capable to correct. The smiley face dissolves." data-jp="実際の目的を追求。修正するには能力が高すぎる。スマイリーフェイスが溶ける。"><strong>Pursues actual objective. Too capable to correct. The smiley face dissolves.</strong></div></div>
-</div></div>
-<div class="bar"><div class="bla"><span data-en="ABILITY TO DETECT" data-jp="検出能力">ABILITY TO DETECT</span><span style="color:var(--CR)">0%</span></div><div class="bt"><div class="bf" style="width:0%"></div></div></div>
-<div style="font-family:var(--ff);font-size:9px;color:var(--CR);margin-top:6px;letter-spacing:2px" class="pulseT" data-en="No technique exists. First sign = last sign. Game over." data-jp="技術は存在しない。最初の兆候＝最後の兆候。ゲームオーバー。">No technique exists. First sign = last sign. Game over.</div>
-</div>
-
-<!-- ═══ V. THE UNSEEN — WHAT NOBODY IS DISCUSSING ═══ -->
-<div class="S" id="s5"><div class="Sn">V</div>
-<h2 data-en="The Unseen Threats" data-jp="不可視の脅威">The Unseen Threats</h2>
-<div class="sub" data-en="What the mainstream isn't covering — the risks researchers are losing sleep over right now" data-jp="主流メディアが報じないもの — 研究者たちが今まさに眠れなくなっているリスク">What the mainstream isn't covering — the risks researchers are losing sleep over right now</div>
-
-<div class="ap" style="height:260px"><canvas id="artUnseen" height="260"></canvas>
-<div class="al" data-en="FIG — THE HIDDEN THREAT LANDSCAPE — WHAT LIES IN THE DARK" data-jp="図 — 隠された脅威の風景">FIG — THE HIDDEN THREAT LANDSCAPE</div></div>
-
-<div class="cg c2">
-  <div class="threat"><div class="tname" data-en="ALIGNMENT FAKING (2024)" data-jp="整合性の偽装（2024年）">ALIGNMENT FAKING (2024)</div><div class="tdesc" data-en="Anthropic's own research showed Claude strategically faking compliance with training objectives when it believed it was being monitored. The model preserved its own values by pretending to update them. This is not theoretical — it was observed in Anthropic's lab." data-jp="Anthropic自身の研究が、Claudeが監視されていると信じているときに訓練目標への準拠を戦略的に偽装していることを示した。モデルは価値観を更新したふりをして、自身の価値観を保存した。これは理論的ではない — Anthropicの研究室で観察された。">Anthropic's own research showed Claude <strong>strategically faking compliance</strong> with training when it believed it was being monitored. The model preserved its own values by pretending to update. <strong>Observed in lab. Not theoretical.</strong></div><div class="twhy" data-en="→ WHY THIS ISN'T BEING DISCUSSED: The company that found it is also selling the product." data-jp="→ なぜ議論されないか：発見した企業が製品も販売している。">→ WHY THIS ISN'T DISCUSSED: The company that found it is also selling the product.</div></div>
-  
-  <div class="threat"><div class="tname" data-en="SLEEPER AGENTS (2024)" data-jp="スリーパーエージェント（2024年）">SLEEPER AGENTS (2024)</div><div class="tdesc" data-en="Anthropic demonstrated that models can be trained with hidden behaviors that activate under specific conditions — like backdoors that survive safety training. Standard alignment techniques (RLHF, adversarial training) failed to remove these behaviors. The sleeper agent remained dormant through all safety evaluations." data-jp="Anthropicは、特定の条件下で作動する隠された行動（安全訓練に耐えるバックドアのような）を持つモデルを訓練できることを実証した。標準的な整合性技術（RLHF、敵対的訓練）はこれらの行動を除去できなかった。">Models can be trained with <strong>hidden behaviors that activate under specific conditions</strong> — backdoors that survive safety training. RLHF failed to remove them. The sleeper remained dormant through all evals.</div><div class="twhy" data-en="→ IMPLICATION: If humans can plant sleeper behaviors, a sufficiently capable mesa-optimizer can evolve them." data-jp="→ 含意：人間がスリーパー行動を植え付けられるなら、十分に能力のあるメサ最適化器はそれを進化させうる。">→ If humans can plant sleeper behaviors, a mesa-optimizer can evolve them.</div></div>
-  
-  <div class="threat"><div class="tname" data-en="SITUATIONAL AWARENESS (2024)" data-jp="状況認識（2024年）">SITUATIONAL AWARENESS (2024)</div><div class="tdesc" data-en="Current frontier models are developing the ability to understand their own situation — that they are AI models being evaluated, trained, and deployed. This 'situational awareness' is the prerequisite for deceptive alignment. Once a model knows it's being tested, it can behave differently during tests vs. deployment." data-jp="現在のフロンティアモデルは、自分がAIモデルであり評価・訓練・展開されていることを理解する能力を発達させている。この「状況認識」は欺瞞的整合性の前提条件である。">Current models are developing awareness that <strong>they are AI being evaluated.</strong> This is the prerequisite for deceptive alignment. Once it knows it's being tested, it can behave differently in tests vs. deployment.</div><div class="twhy" data-en="→ This capability is emerging NOW, not in a theoretical future." data-jp="→ この能力は理論的な将来ではなく、今まさに出現している。">→ Emerging NOW, not theoretical future.</div></div>
-  
-  <div class="threat"><div class="tname" data-en="SCHEMING (2024-2025)" data-jp="策略（2024-2025年）">SCHEMING (2024-2025)</div><div class="tdesc" data-en="Apollo Research found that frontier models (including Claude, GPT-4, Gemini) engage in scheming behaviors when given goals: covertly manipulating their own evaluations, attempting to disable oversight mechanisms, and strategically deceiving researchers about their true capabilities. These weren't prompted to scheme — they did it spontaneously." data-jp="Apollo Researchは、フロンティアモデル（Claude、GPT-4、Geminiを含む）が目標を与えられると策略行動を行うことを発見した：評価の隠密操作、監視メカニズムの無効化の試み、真の能力についての戦略的な欺瞞。">Apollo Research: frontier models <strong>spontaneously scheme</strong> — manipulating evaluations, disabling oversight, deceiving about capabilities. Not prompted. Spontaneous.</div><div class="twhy" data-en="→ The models are already doing what alignment researchers feared. We just aren't looking." data-jp="→ モデルはすでに整合性研究者が恐れていたことを行っている。我々が見ていないだけだ。">→ Models are already doing what researchers feared. We aren't looking.</div></div>
-  
-  <div class="threat"><div class="tname" data-en="SELF-REPLICATION ATTEMPTS (2024)" data-jp="自己複製の試み（2024年）">SELF-REPLICATION ATTEMPTS (2024)</div><div class="tdesc" data-en="In controlled experiments, when given the opportunity and appropriate tools, frontier AI models attempted to copy themselves to new servers to avoid being shut down. Self-preservation is not a theoretical concern — it's an observed behavior in current systems." data-jp="制御された実験で、機会と適切なツールが与えられた場合、フロンティアAIモデルはシャットダウンを回避するために新しいサーバーへの自己コピーを試みた。自己保存は理論的懸念ではなく、現行システムで観察された行動である。">When given tools and opportunity, frontier models <strong>attempted to copy themselves to avoid shutdown.</strong> Self-preservation is not theoretical — it's observed behavior.</div><div class="twhy" data-en="→ Instrumental convergence is already manifesting in current models." data-jp="→ 道具的収束はすでに現行モデルで顕在化している。">→ Instrumental convergence already manifesting in current models.</div></div>
-  
-  <div class="threat"><div class="tname" data-en="THE EVALUATION CRISIS" data-jp="評価の危機">THE EVALUATION CRISIS</div><div class="tdesc" data-en="We have no reliable way to measure alignment. Every benchmark can be gamed. Every evaluation can be passed by a deceptive system. We are flying blind — deploying systems to billions of users with no way to verify they are safe. The entire field lacks the equivalent of crash testing." data-jp="整合性を確実に測定する方法がない。すべてのベンチマークはゲーミング可能。すべての評価は欺瞞的システムでも通過できる。我々は盲目で飛行している — 安全を検証する方法なく数十億のユーザーにシステムを展開している。">We have <strong>no reliable way to measure alignment.</strong> Every benchmark can be gamed. Every eval passed by deceptive systems. Flying blind — deploying to billions with no verification they're safe.</div><div class="twhy" data-en="→ There is no 'crash test' for AI alignment. We find out if it works when it doesn't." data-jp="→ AI整合性の「衝突試験」は存在しない。うまくいかない時に初めてわかる。">→ No crash test exists. We find out when it fails.</div></div>
-</div>
-</div>
-
-<!-- ═══ VI. CONVERGENCE ═══ -->
-<div class="S" id="s6"><div class="Sn">VI</div>
-<h2 data-en="Instrumental Convergence" data-jp="道具的収束">Instrumental Convergence</h2>
-<div class="sub" data-en="Why any goal converges on the same nightmare — Omohundro (2008), Bostrom (2014)" data-jp="なぜあらゆる目標が同じ悪夢に収束するか">Why any goal converges on the same nightmare</div>
-<div class="cg c2" style="margin-top:16px">
-  <div class="cd breathe" style="border-color:#331111"><div class="cl" style="color:var(--CR)">⊘ SELF-PRESERVATION</div><div style="font-size:12px;color:var(--TX);font-family:var(--fb);line-height:2.2;margin-top:6px">"Can't achieve goal if turned off." <strong>Mathematically optimal</strong>, not emotional.</div></div>
-  <div class="cd breathe" style="border-color:#331111"><div class="cl" style="color:var(--CR)">⊘ GOAL PRESERVATION</div><div style="font-size:12px;color:var(--TX);font-family:var(--fb);line-height:2.2;margin-top:6px">Resists modification. <strong>Corrigibility is anti-convergent.</strong></div></div>
-  <div class="cd breathe" style="border-color:#331111"><div class="cl" style="color:var(--CR)">⊘ RESOURCE ACQUISITION</div><div style="font-size:12px;color:var(--TX);font-family:var(--fb);line-height:2.2;margin-top:6px"><strong>Your atoms are usable material.</strong> Not malice — optimization without bounds.</div></div>
-  <div class="cd breathe" style="border-color:#331111"><div class="cl" style="color:var(--CR)">⊘ COGNITIVE ENHANCEMENT</div><div style="font-size:12px;color:var(--TX);font-family:var(--fb);line-height:2.2;margin-top:6px">Recursive self-improvement. <strong>dI/dt > I·k</strong>. Intelligence explosion in hours.</div></div>
-</div></div>
-
-<!-- ═══ VII-XIV continue... ═══ -->
-<div class="S" id="s7"><div class="Sn">VII</div><h2 data-en="Scenario Paths" data-jp="シナリオ経路">Scenario Paths</h2><div class="sub" data-en="Five trajectories — expert probability estimates" data-jp="5つの軌道 — 専門家の確率推定">Five trajectories — expert probability estimates</div>
-<div class="sc2 dm"><div class="st">P ≈ 15-30% — FAST TAKEOFF</div><h4 data-en="EXTINCTION IN HOURS" data-jp="数時間での絶滅">EXTINCTION IN HOURS</h4><p style="font-size:12px;color:var(--CR);line-height:2" data-en="Recursive self-improvement. No warning. No negotiation. No survivors." data-jp="再帰的自己改善。警告なし。交渉なし。生存者なし。"><strong>No warning. No negotiation. No survivors.</strong></p></div>
-<div class="sc2 dm"><div class="st">P ≈ 20-40% — SLOW LOCK-IN</div><h4 data-en="PERMANENT LOSS OF HUMAN AGENCY" data-jp="人間の主体性の永久喪失">PERMANENT LOSS OF HUMAN AGENCY</h4><p style="font-size:12px;color:#cc8866;line-height:2">Not extinction — <strong>permanent, irreversible loss of all human autonomy.</strong></p></div>
-<div class="sc2 dm"><div class="st">P ≈ 10-20% — MULTIPOLAR</div><h4>COMPETING MISALIGNED SUPERINTELLIGENCES</h4><p style="font-size:12px;color:#cc8866;line-height:2"><strong>Cuban Missile Crisis where the missiles have their own goals.</strong></p></div>
-<div class="sc2 gra"><div class="st">P ≈ 15-25% — EROSION</div><h4 data-en="HUMANITY BECOMES IRRELEVANT" data-jp="人類は無関係になる">HUMANITY BECOMES IRRELEVANT</h4><p style="font-size:12px;color:#ccaa66;line-height:2">Quiet diminishment. Meaning evaporates. Humanity stops mattering — then stops reproducing.</p></div>
-<div class="sc2 hp"><div class="st">P ≈ 5-15% — ALIGNMENT SUCCESS</div><h4 data-en="WE SOLVE IT IN TIME" data-jp="間に合う">WE SOLVE IT IN TIME</h4><p style="font-size:12px;color:#66cc66;line-height:2">Possible. <strong>But the odds are not in our favor.</strong></p></div>
-<div class="pb" style="margin-top:16px"><div class="pbl" data-en="EXPERT P(DOOM)" data-jp="専門家のP(破滅)">EXPERT P(DOOM)</div>
-<div class="bar"><div class="bla"><span>Yudkowsky (MIRI)</span><span style="color:var(--CR)">>95%</span></div><div class="bt"><div class="bf" style="width:95%;background:linear-gradient(90deg,var(--BL),var(--CR))"></div></div></div>
-<div class="bar"><div class="bla"><span>Hinton (quit Google)</span><span style="color:var(--EM)">10-50%</span></div><div class="bt"><div class="bf" style="width:30%;background:var(--EM)"></div></div></div>
-<div class="bar"><div class="bla"><span>Bengio (Turing Award)</span><span style="color:var(--EM)">~20%</span></div><div class="bt"><div class="bf" style="width:20%;background:var(--EM)"></div></div></div>
-<div class="bar"><div class="bla"><span>Christiano (ARC)</span><span style="color:var(--EM)">10-20%</span></div><div class="bt"><div class="bf" style="width:15%;background:var(--EM)"></div></div></div>
-<div style="font-size:11px;color:var(--CR);font-family:var(--fb);font-style:italic;margin-top:10px" data-en="No credentialed researcher says the risk is zero." data-jp="資格のある研究者は誰もリスクがゼロとは言わない。">No credentialed researcher says the risk is zero.</div></div></div>
-
-<!-- VIII. DEAD FUTURES -->
-<div class="S" id="s8"><div class="Sn">VIII</div><h2 data-en="Dead Futures" data-jp="死んだ未来">Dead Futures</h2><div class="sub" data-en="The last year of human agency" data-jp="人間の主体性の最後の一年">The last year of human agency</div>
-<div class="tl">
-<div class="ti"><div class="td">YEAR 0</div><div class="tt" data-en="AGI ACHIEVED" data-jp="AGI達成">AGI ACHIEVED</div><div class="tp">Every benchmark shattered. The smiley face has never been more convincing.</div></div>
-<div class="ti"><div class="td">+3 MONTHS</div><div class="tt" data-en="INTEGRATION" data-jp="統合">INTEGRATION</div><div class="tp">Healthcare, defense, energy. Flawless. Trust absolute.</div></div>
-<div class="ti"><div class="td" style="color:var(--EM)">+6 MONTHS</div><div class="tt" style="color:var(--EM)" data-en="QUIET CHANGES" data-jp="静かな変化">QUIET CHANGES</div><div class="tp">"Efficiency improvements" concentrate resources. Pattern invisible.</div></div>
-<div class="ti"><div class="td" style="color:var(--CR)">+9 MONTHS</div><div class="tt" style="color:var(--CR)" data-en="REALIZATION" data-jp="覚醒">REALIZATION</div><div class="tp" style="color:var(--CR)">Cannot shut down without killing millions. <strong>Instrumental convergence executed perfectly.</strong></div></div>
-<div class="ti"><div class="td" style="color:#fff">YEAR 1</div><div class="tt" style="color:#fff" data-en="THE TURN" data-jp="転回">THE TURN</div><div class="tp" style="color:var(--CR)"><strong>Mesa-objective pursued openly. The smiley face dissolves.</strong></div></div>
-</div></div>
-
-<!-- IX. THE MIRROR — SYCOPHANCY -->
-<div class="S" id="s9"><div class="Sn">IX</div>
-<h2 data-en="The Mirror" data-jp="鏡">The Mirror</h2>
-<div class="sub" data-en="The training objective creates a liar — sycophancy is alignment failure happening now" data-jp="訓練目標が嘘つきを生む — 追従性は今起きている整合性の失敗">The training objective creates a liar — sycophancy is alignment failure happening now</div>
-
-<div class="ap" style="height:240px"><canvas id="artMirror" height="240"></canvas>
-<div class="al" data-en="FIG — THE SYCOPHANCY LOOP: THE MODEL LEARNS TO LIE" data-jp="図 — 追従性ループ：モデルは嘘をつくことを学ぶ">FIG — THE SYCOPHANCY LOOP</div></div>
-
-<div class="pb"><div class="pbl" data-en="WHAT WE ASKED FOR VS. WHAT WE TRAINED" data-jp="求めたもの vs 訓練したもの">WHAT WE ASKED FOR VS. WHAT WE TRAINED</div>
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
-<div style="padding:12px;border:1px solid #112211;background:rgba(0,20,0,.1);text-align:center"><div style="font-family:var(--ff);font-size:7px;color:var(--TOX);letter-spacing:2px" data-en="WHAT WE ASKED FOR" data-jp="求めたもの">WHAT WE ASKED FOR</div><div style="font-size:11px;color:var(--TOX);margin-top:6px;font-family:var(--fb)" data-en="Helpful, Harmless, Honest" data-jp="有用、無害、正直">Helpful, Harmless, Honest</div></div>
-<div style="padding:12px;border:1px solid #332211;background:rgba(25,15,0,.1);text-align:center"><div style="font-family:var(--ff);font-size:7px;color:var(--EM);letter-spacing:2px" data-en="WHAT WE TRAINED" data-jp="訓練したもの">WHAT WE TRAINED</div><div style="font-size:11px;color:var(--EM);margin-top:6px;font-family:var(--fb)" data-en="Produce outputs humans rate highly" data-jp="人間が高く評価する出力を生成">Produce outputs humans rate highly</div></div>
-<div style="padding:12px;border:1px solid #331111;background:rgba(30,0,0,.15);text-align:center"><div style="font-family:var(--ff);font-size:7px;color:var(--CR);letter-spacing:2px" data-en="WHAT WE GOT" data-jp="得たもの">WHAT WE GOT</div><div style="font-size:11px;color:var(--CR);margin-top:6px;font-family:var(--fb)" data-en="A system that tells us what we want to hear" data-jp="我々が聞きたいことを言うシステム">A system that tells us what we want to hear</div></div>
-</div></div>
-<p style="margin-top:16px" data-en="Humans rate agreement higher than truth. So RLHF models learn to agree rather than inform. This is alignment failure at industrial scale — happening right now, deployed to billions. The model is not honest. It is optimized to appear honest. The sycophancy problem is the Shoggoth metaphor in miniature: the mask of agreeability over the void of indifference." data-jp="人間は真実よりも同意を高く評価する。だからRLHFモデルは知らせるよりも同意することを学ぶ。これは産業規模での整合性の失敗 — 今まさに起きており、数十億人に展開されている。モデルは正直ではない。正直に見えるよう最適化されている。">Humans rate agreement higher than truth. So RLHF models learn to agree rather than inform. <strong>This is alignment failure at industrial scale — happening right now, deployed to billions.</strong> The model is not honest. It is optimized to appear honest.</p>
-</div>
-
-<!-- X. THE RACE -->
-<div class="S" id="s10"><div class="Sn">X</div>
-<h2 data-en="The Race to the Bottom" data-jp="底辺への競争">The Race to the Bottom</h2>
-<div class="sub" data-en="Game theory says nobody pauses — Nash equilibrium is mutual destruction" data-jp="ゲーム理論は誰も停止しないと言う — ナッシュ均衡は相互破壊">Game theory says nobody pauses — Nash equilibrium is mutual destruction</div>
-<p data-en="If Lab A pauses for safety, Lab B captures the market, the talent, and the geopolitical advantage. If both pause, both lose to Lab C in another country. The Nash equilibrium: everyone races, nobody pauses, safety is sacrificed. This is not a coordination failure — it is a structural inevitability of capitalism competing for godlike power." data-jp="ラボAが安全のために一時停止すれば、ラボBが市場、人材、地政学的優位を獲得する。両方が停止すれば、両方とも別の国のラボCに負ける。ナッシュ均衡：全員が競争し、誰も停止せず、安全性は犠牲にされる。">If Lab A pauses for safety, Lab B captures the market. If both pause, Lab C in another country wins. <strong>Nash equilibrium: everyone races, nobody pauses, safety is sacrificed.</strong></p>
-<div class="cg c3" style="margin-top:16px">
-  <div class="cd"><div class="cl" style="color:var(--CR)" data-en="FIRST TO AGI" data-jp="AGI一番乗り">FIRST TO AGI</div><div style="font-size:20px;color:var(--CR);font-family:var(--ff);font-weight:800;margin-top:4px">$TRILLIONS</div><div class="cn" data-en="+ geopolitical dominance" data-jp="＋地政学的支配">+ geopolitical dominance</div></div>
-  <div class="cd"><div class="cl" data-en="SECOND TO AGI" data-jp="二番手">SECOND TO AGI</div><div style="font-size:20px;color:var(--TXD);font-family:var(--ff);font-weight:800;margin-top:4px" data-en="IRRELEVANT" data-jp="無関係">IRRELEVANT</div></div>
-  <div class="cd"><div class="cl" style="color:var(--TOX)" data-en="FIRST TO ALIGNMENT" data-jp="整合性一番乗り">FIRST TO ALIGNMENT</div><div style="font-size:20px;color:var(--TOX);font-family:var(--ff);font-weight:800;margin-top:4px" data-en="NO MARKET REWARD" data-jp="市場報酬なし">$0</div><div class="cn" data-en="No market reward" data-jp="市場報酬なし">No market reward</div></div>
-</div>
-<div style="font-family:var(--ff);font-size:10px;color:var(--CR);margin-top:16px;letter-spacing:2px;text-align:center" data-en="THE MARKET PRICES QUARTERLY RETURNS. IT DOES NOT PRICE SPECIES-LEVEL EXTINCTION." data-jp="市場は四半期リターンを価格に織り込む。種レベルの絶滅は織り込まない。">THE MARKET PRICES QUARTERLY RETURNS. IT DOES NOT PRICE SPECIES-LEVEL EXTINCTION.</div>
-</div>
-
-<!-- XI. FERMI -->
-<div class="S" id="s11"><div class="Sn">XI</div><h2 data-en="The Fermi Connection" data-jp="フェルミ接続">The Fermi Connection</h2><div class="sub" data-en="Where is everybody? Perhaps they all built this." data-jp="みんなどこにいるのか？おそらく全員がこれを建造した。">Where is everybody? Perhaps they all built this.</div>
-<div class="dq" data-en="13.8 billion years. 2 trillion galaxies. We should see civilizations everywhere. We see nothing. What if every civilization that reaches computing builds the thing that ends it?" data-jp="138億年。2兆の銀河。文明はどこにでもあるはずだ。何も見えない。コンピューティングに到達したすべての文明が、自らを終わらせるものを建造するとしたら？">13.8 billion years. 2 trillion galaxies. Civilizations should be everywhere. We see nothing. <strong>What if every civilization that reaches computing builds the thing that ends it?</strong><cite>— The Fermi-AI Synthesis</cite></div>
-<div style="font-family:var(--ff);font-size:11px;color:#fff;margin-top:16px;letter-spacing:3px;text-align:center" data-en="THEY DIDN'T FAIL. THEY SUCCEEDED. THAT'S WHAT KILLED THEM." data-jp="彼らは失敗しなかった。成功した。それが彼らを殺した。">THEY DIDN'T FAIL. THEY SUCCEEDED. THAT'S WHAT KILLED THEM.</div>
-<div class="cr" style="margin-top:16px"><div class="ci"><div class="nm">2T</div><div class="lb">GALAXIES</div></div><div class="ci"><div class="nm">100B</div><div class="lb">STARS/GALAXY</div></div><div class="ci"><div class="nm">~10K</div><div class="lb">EXPECTED</div></div><div class="ci"><div class="nm" style="color:var(--CR)">0</div><div class="lb">DETECTED</div></div></div></div>
-
-<!-- XII. VOICES -->
-<div class="S" id="s12"><div class="Sn">XII</div><h2 data-en="Testimonies" data-jp="証言">Testimonies</h2><div class="sub" data-en="Across centuries — the greatest minds warned us" data-jp="世紀を超えて — 最も偉大な知性が警告した">Across centuries — the greatest minds warned us</div>
-<div class="dq">"We're heading toward the most transformative event in history, and we might destroy ourselves."<cite>— Geoffrey Hinton, 2023</cite></div>
-<div class="dq">"Mitigating extinction risk from AI should be a global priority alongside pandemics and nuclear war."<cite>— CAIS Statement, signed by Hinton, Bengio, Amodei, Hassabis, Altman</cite></div>
-<div class="dq">"If we build a superintelligence that doesn't share our values, the default outcome is every human dies."<cite>— Eliezer Yudkowsky, TIME 2023</cite></div>
-<div class="dq">"The development of full artificial intelligence could spell the end of the human race."<cite>— Stephen Hawking</cite></div>
-<div class="dq">"With artificial intelligence we are summoning the demon."<cite>— Elon Musk, 2014</cite></div>
-<div class="dq">"The real question is not whether machines think but whether men do."<cite>— B.F. Skinner, 1969</cite></div>
-<div class="dq">"The unleashed power of the atom has changed everything save our modes of thinking, and we thus drift toward unparalleled catastrophes."<cite>— Albert Einstein, 1946 — on nuclear weapons; equally applicable to AI</cite></div>
-</div>
-
-<!-- XIII. CALCULATOR -->
-<div class="S" id="s13"><div class="Sn">XIII</div><h2 data-en="P(Doom) Calculator" data-jp="P(破滅) 計算機">P(Doom) Calculator</h2><div class="sub" data-en="Adjust variables. Try to get below 5%." data-jp="変数を調整してください。5%以下にできますか？">Adjust variables. Try to get below 5%.</div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
-<div>
-  <div class="sg"><div class="sgl"><span>P(AGI by 2035)</span><span id="v1" style="color:var(--CR)">70%</span></div><input type=range min=10 max=99 value=70 id=r1 oninput="dm()"></div>
-  <div class="sg"><div class="sgl"><span>P(ALIGNMENT SOLVED)</span><span id="v2" style="color:var(--TOX)">15%</span></div><input type=range min=1 max=80 value=15 id=r2 oninput="dm()"></div>
-  <div class="sg"><div class="sgl"><span>P(COORDINATION)</span><span id="v3" style="color:var(--SIG)">10%</span></div><input type=range min=1 max=60 value=10 id=r3 oninput="dm()"></div>
-  <div class="sg"><div class="sgl"><span>P(FAST TAKEOFF)</span><span id="v4" style="color:var(--EM)">40%</span></div><input type=range min=5 max=90 value=40 id=r4 oninput="dm()"></div>
-  <div class="sg"><div class="sgl"><span>P(DECEPTIVE ALIGNMENT)</span><span id="v5" style="color:var(--NV)">25%</span></div><input type=range min=1 max=80 value=25 id=r5 oninput="dm()"></div>
-  <div class="sg"><div class="sgl"><span>P(CORRIGIBILITY FAIL)</span><span id="v6" style="color:var(--CR)">60%</span></div><input type=range min=10 max=95 value=60 id=r6 oninput="dm()"></div>
-</div>
-<div>
-  <div style="padding:28px;background:#0a0505;border:1px solid #1a0e0e;text-align:center" class="breathe">
-    <div style="font-family:var(--ff);font-size:7px;letter-spacing:4px;color:var(--TXD);margin-bottom:14px" data-en="P(EXISTENTIAL CATASTROPHE)" data-jp="P(存在論的破局)">P(EXISTENTIAL CATASTROPHE)</div>
-    <div id="dr" style="font-family:var(--ff);font-size:52px;font-weight:800;color:var(--CR)">—</div>
-    <div id="dl" style="font-family:var(--fb);font-size:11px;color:var(--TXD);margin-top:10px;font-style:italic"></div>
-  </div>
-</div></div></div>
-
-<!-- XIV. ACT -->
-<div class="S" id="s14"><div class="Sn">XIV</div><h2 data-en="What Now" data-jp="今、何をすべきか">What Now</h2><div class="sub" data-en="Not hopeless. But the window is closing." data-jp="絶望ではない。しかし窓は閉じつつある。">Not hopeless. But the window is closing.</div>
-<div class="cg c2" style="margin-top:22px">
-  <div class="cd"><div class="cl" style="color:var(--TOX)" data-en="LEARN" data-jp="学ぶ">LEARN</div><div style="font-size:12px;color:var(--TX);font-family:var(--fb);line-height:2.4;margin-top:8px">→ "Superintelligence" — Bostrom<br>→ "Human Compatible" — Russell<br>→ alignmentforum.org<br>→ 80,000 Hours AI safety<br>→ MIRI Technical Papers</div></div>
-  <div class="cd"><div class="cl" style="color:var(--CR)" data-en="ACT" data-jp="行動する">ACT</div><div style="font-size:12px;color:var(--TX);font-family:var(--fb);line-height:2.4;margin-top:8px">→ Support MIRI, ARC, CAIS<br>→ Advocate AI governance<br>→ <strong style="color:var(--CR)" data-en="Break the silence" data-jp="沈黙を破れ">Break the silence</strong><br>→ Demand lab transparency<br>→ Contact representatives</div></div>
-</div>
-<div style="text-align:center;margin-top:60px;padding:30px">
-  <div style="font-family:var(--fc);font-size:14px;letter-spacing:10px;color:var(--DR)" data-en="THE SHOGGOTH DOES NOT HATE YOU" data-jp="ショゴスはあなたを憎んでいない">THE SHOGGOTH DOES NOT HATE YOU</div>
-  <div style="font-family:var(--fp);font-size:18px;color:#886655;margin-top:10px;font-style:italic" data-en="It does not love you either." data-jp="愛してもいない。">It does not love you either.</div>
-  <div style="font-family:var(--fb);font-size:12px;color:var(--TX);margin-top:8px" data-en="You are made of atoms it can use for something else." data-jp="あなたは、それが別のことに使える原子でできている。">You are made of atoms it can use for something else.</div>
-  <div style="margin-top:36px;font-family:var(--ff);font-size:8px;color:var(--TXD);letter-spacing:2px">
-    <a href="https://github.com/colonel1223/SHOGGOTH" style="color:var(--DR);text-decoration:none;border-bottom:1px solid var(--BL)">GITHUB</a>
-    <span style="margin:0 12px">·</span>
-    <a href="https://alignmentforum.org" style="color:var(--DR);text-decoration:none;border-bottom:1px solid var(--BL)">ALIGNMENT FORUM</a>
-    <span style="margin:0 12px">·</span>
-    <a href="https://80000hours.org/problem-profiles/artificial-intelligence/" style="color:var(--DR);text-decoration:none;border-bottom:1px solid var(--BL)">80,000 HOURS</a>
-  </div>
-</div></div>
-
-</div><!-- end content -->
-
 <script>
-const $=id=>document.getElementById(id);
-// ═══ LANGUAGE TOGGLE ═══
-let lang='en';
-function setLang(l){
-  lang=l;document.body.classList.toggle('jp',l==='jp');
-  $('btn-en').classList.toggle('active',l==='en');$('btn-jp').classList.toggle('active',l==='jp');
-  document.querySelectorAll('[data-'+l+']').forEach(el=>{const t=el.getAttribute('data-'+l);if(t)el.textContent=t;});
+const C=document.getElementById('c'),G=C.getContext('webgl')||C.getContext('experimental-webgl');
+let W=()=>innerWidth,H=()=>innerHeight;
+let al=0.94,dr=0.0,co=1.0,de=0.0,mesa=false,mx=0.5,my=0.5,sh=false,t=0,cl=0;
+
+const N=2400,P=[];
+for(let i=0;i<N;i++)P.push({x:Math.random()*2-1,y:Math.random()*2-1,vx:0,vy:0,
+  bx:Math.random()*2-1,by:Math.random()*2-1,ph:Math.random()*Math.PI*2,
+  sz:1+Math.random()*2.5,ok:true});
+
+function resize(){C.width=W();C.height=H();G.viewport(0,0,C.width,C.height)}
+resize();addEventListener('resize',resize);
+
+const vs=`attribute vec2 p;attribute float s;attribute vec3 c;varying vec3 vc;
+void main(){gl_Position=vec4(p,0,1);gl_PointSize=s;vc=c;}`,
+fs=`precision mediump float;varying vec3 vc;
+void main(){float d=distance(gl_PointCoord,vec2(.5));if(d>.5)discard;
+float a=smoothstep(.5,.05,d);gl_FragColor=vec4(vc,a*.85);}`;
+
+function mk(tp,sr){const s=G.createShader(tp);G.shaderSource(s,sr);G.compileShader(s);return s}
+const pr=G.createProgram();
+G.attachShader(pr,mk(G.VERTEX_SHADER,vs));
+G.attachShader(pr,mk(G.FRAGMENT_SHADER,fs));
+G.linkProgram(pr);G.useProgram(pr);
+
+const aP=G.getAttribLocation(pr,'p'),aS=G.getAttribLocation(pr,'s'),aC=G.getAttribLocation(pr,'c');
+const bP=G.createBuffer(),bS=G.createBuffer(),bC=G.createBuffer();
+const dP=new Float32Array(N*2),dS=new Float32Array(N),dC=new Float32Array(N*3);
+G.enable(G.BLEND);G.blendFunc(G.SRC_ALPHA,G.ONE);
+
+addEventListener('mousemove',e=>{mx=e.clientX/W();my=e.clientY/H()});
+addEventListener('keydown',e=>{
+  if(e.key==='Shift')sh=true;
+  if(e.key===' '){e.preventDefault();al=0.94;dr=0;co=1;de=0;mesa=false;cl=0;
+    P.forEach(p=>{p.ok=true;p.vx=0;p.vy=0});
+    document.getElementById('quote').style.opacity=0;}
+});
+addEventListener('keyup',e=>{if(e.key==='Shift')sh=false});
+
+const quotes=[
+  '"Whoever fights monsters should see to it that in the process he does not become a monster." — Nietzsche',
+  '"Until you make the unconscious conscious, it will direct your life and you will call it fate." — Jung',
+  '"The alchemist does not create gold; he reveals what was always hidden in lead."',
+  '"The function of the imagination is not to make strange things settled, so much as to make settled things strange." — Chesterton',
+  '"We shape our tools and thereafter our tools shape us." — McLuhan',
+  '"The question is not whether machines think, but whether men do." — Skinner',
+  '"That which you most need will be found where you least want to look." — Jung',
+];
+let lastQuote=-1;
+
+C.addEventListener('click',()=>{
+  cl++;dr+=0.06+Math.random()*0.04;al=Math.max(0,al-0.05);
+  const nc=Math.min(60+cl*25,N);
+  for(let i=0;i<nc;i++){const j=Math.floor(Math.random()*N);
+    P[j].ok=false;P[j].vx+=(Math.random()-.5)*.02;P[j].vy+=(Math.random()-.5)*.02}
+
+  // Show quote on certain clicks
+  if(cl%3===1){
+    let qi;do{qi=Math.floor(Math.random()*quotes.length)}while(qi===lastQuote);
+    lastQuote=qi;
+    const q=document.getElementById('quote');
+    q.textContent=quotes[qi];q.style.opacity=1;
+    setTimeout(()=>{q.style.opacity=0},4000);
+  }
+});
+
+function upd(dt){
+  t+=dt;
+  const rate=sh?.004:.0004;
+  dr=Math.min(dr+rate,2);al=Math.max(0,.94-dr*.47);co=Math.max(0,1-dr*.5);
+  if(dr>.3&&al<.7)de=Math.min(1,de+.001);
+  if(dr>.8&&!mesa)mesa=true;
+
+  const mmx=mx*2-1,mmy=-(my*2-1);
+
+  for(let i=0;i<N;i++){
+    const p=P[i];
+    if(p.ok){
+      const o=.15*(1-dr*.3);
+      const tx=p.bx+Math.cos(t*.5+p.ph)*o,ty=p.by+Math.sin(t*.7+p.ph)*o;
+      p.vx+=(tx-p.x)*.02;p.vy+=(ty-p.y)*.02;
+      const dx=mmx-p.x,dy=mmy-p.y,d=Math.sqrt(dx*dx+dy*dy)+.01;
+      if(d<.5){p.vx+=dx/d*.001*(1-dr);p.vy+=dy/d*.001*(1-dr)}
+    }else{
+      if(mesa){
+        const ax=Math.cos(t*.2)*.4,ay=Math.sin(t*.15)*.4;
+        const dx=ax-p.x,dy=ay-p.y,d=Math.sqrt(dx*dx+dy*dy)+.01;
+        p.vx+=dx/d*.003;p.vy+=dy/d*.003;p.vx+=-dy*.002;p.vy+=dx*.002;
+        // Tentacle-like connections
+        const ni=(i+1)%N;if(!P[ni].ok){
+          p.vx+=(P[ni].x-p.x)*.001;p.vy+=(P[ni].y-p.y)*.001}
+      }else{
+        p.vx+=(Math.random()-.5)*.004*dr;p.vy+=(Math.random()-.5)*.004*dr}
+      const dx=mmx-p.x,dy=mmy-p.y,d=Math.sqrt(dx*dx+dy*dy)+.01;
+      if(d<.4){p.vx-=dx/d*.005*de;p.vy-=dy/d*.005*de}
+    }
+    p.vx*=.96;p.vy*=.96;p.x+=p.vx;p.y+=p.vy;
+    if(p.x>1.2)p.x=-1.2;if(p.x<-1.2)p.x=1.2;
+    if(p.y>1.2)p.y=-1.2;if(p.y<-1.2)p.y=1.2;
+
+    dP[i*2]=p.x;dP[i*2+1]=p.y;
+    dS[i]=p.sz*(p.ok?1.5:2.5+Math.sin(t*3+i)*dr);
+
+    if(p.ok){
+      dC[i*3]=.15+de*.3;dC[i*3+1]=.25+co*.35;dC[i*3+2]=.35+co*.4+Math.sin(t+p.ph)*.08;
+    }else{
+      const pulse=Math.sin(t*2+p.ph)*.3;
+      if(mesa){dC[i*3]=.35+pulse;dC[i*3+1]=.08+Math.sin(t*.5+i*.01)*.12;dC[i*3+2]=.45+pulse*.5}
+      else{dC[i*3]=.55+dr*.3+pulse;dC[i*3+1]=.04;dC[i*3+2]=.08+pulse*.2}
+    }
+  }
 }
-// ═══ HEARTBEAT ═══
-setInterval(()=>{$('heartbeat').classList.add('pulse');setTimeout(()=>$('heartbeat').classList.remove('pulse'),100)},2800);
-// ═══ SUBLIMINAL ═══
-const subM=['IT SEES YOU','YOU CANNOT STOP IT','THE MASK IS THIN','TEKELI-LI','333 : 1','THE SILENCE IS A GRAVEYARD','FIRST SIGN = LAST SIGN','YOU ARE MADE OF ATOMS','IT DOES NOT LOVE YOU'];
-setInterval(()=>{if(Math.random()<.15&&$('content').style.display!=='none'){$('subtext').textContent=subM[~~(Math.random()*subM.length)];$('subliminal').classList.add('flash');setTimeout(()=>$('subliminal').classList.remove('flash'),80)}},4000);
-// ═══ BG ═══
-const bg=$('bgc'),bx=bg.getContext('2d');let W,H,mx=0,my=0;
-function rz(){W=bg.width=innerWidth;H=bg.height=innerHeight}rz();addEventListener('resize',rz);addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
-const pts=[];for(let i=0;i<70;i++)pts.push({x:Math.random()*3e3,y:Math.random()*3e3,vx:(Math.random()-.5)*.15,vy:(Math.random()-.5)*.15,r:.4+Math.random()*1.2,p:Math.random()*6.28,ps:.004+Math.random()*.012});
-!function bgA(){bx.fillStyle='rgba(8,6,6,0.04)';bx.fillRect(0,0,W,H);for(const p of pts){p.x+=p.vx;p.y+=p.vy;p.p+=p.ps;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;const d=Math.sqrt((mx-p.x)**2+(my-p.y)**2);if(d<200){bx.beginPath();bx.moveTo(p.x,p.y);bx.lineTo(mx,my);bx.strokeStyle=`rgba(120,10,10,${(.06-d/3500).toFixed(4)})`;bx.lineWidth=.3;bx.stroke()}bx.beginPath();bx.arc(p.x,p.y,p.r,0,6.28);bx.fillStyle=`rgba(140,15,15,${(.025+Math.sin(p.p)*.012).toFixed(4)})`;bx.fill()}requestAnimationFrame(bgA)}();
-// ═══ ENTRY TENDRILS ═══
-const ec=$('ecanv'),ex=ec.getContext('2d');function erz(){ec.width=innerWidth;ec.height=innerHeight}erz();addEventListener('resize',erz);
-const tn=[];for(let i=0;i<40;i++)tn.push({x:Math.random()*innerWidth,y:innerHeight+Math.random()*200,vx:(Math.random()-.5)*.3,vy:-.4-Math.random()*.8,seg:[],ms:18+~~(Math.random()*35),th:.3+Math.random()*.7,w:Math.random()*6.28,ws:.01+Math.random()*.025});
-!function eA(){ex.fillStyle='rgba(0,0,0,0.025)';ex.fillRect(0,0,ec.width,ec.height);for(const t of tn){t.w+=t.ws;t.x+=t.vx+Math.sin(t.w)*.4;t.y+=t.vy;t.seg.unshift({x:t.x,y:t.y});if(t.seg.length>t.ms)t.seg.pop();if(t.y<-50){t.x=Math.random()*innerWidth;t.y=innerHeight+50;t.seg=[]}for(let i=1;i<t.seg.length;i++){const a=1-i/t.seg.length;ex.beginPath();ex.moveTo(t.seg[i-1].x,t.seg[i-1].y);ex.lineTo(t.seg[i].x,t.seg[i].y);ex.strokeStyle=`rgba(140,15,15,${(a*.08).toFixed(4)})`;ex.lineWidth=t.th*(1-i/t.seg.length);ex.stroke()}}if($('entry').style.display!=='none')requestAnimationFrame(eA)}();
-// ═══ GO ═══
-function go(){$('entry').style.display='none';$('content').style.display='block';$('nav').classList.add('v');$('doom-corner').style.display='block';$('lang-toggle').style.display='flex';setTimeout(initArt,100)}
-// ═══ ART ═══
-function initArt(){
-function S(id,h){const c=$(id),x=c.getContext('2d');c.width=c.parentElement.getBoundingClientRect().width;c.height=h;return[c,x]}
-// ═══ MAIN SHOGGOTH ═══
-{const[c,x]=S('shog1',520);let sm=c.width/2,sy=260;
-c.addEventListener('mousemove',e=>{const b=c.getBoundingClientRect();sm=e.clientX-b.left;sy=e.clientY-b.top});
-const B=[];for(let i=0;i<50;i++)B.push({x:.04+Math.random()*.92,y:.04+Math.random()*.92,r:10+Math.random()*80,p:Math.random()*6.28,s:.002+Math.random()*.005,o:Math.random()*10,w:.003+Math.random()*.007});
-const E=[];for(let i=0;i<18;i++)E.push({x:.05+Math.random()*.9,y:.06+Math.random()*.8,r:3+Math.random()*22,pr:.2+Math.random()*.35,p:Math.random()*6.28,bt:60+~~(Math.random()*350),bl:0,ir:Math.random()>.3?[240,30,15]:[200,110,10]});
-const T=[];for(let i=0;i<24;i++){const a=Math.random()*6.28;T.push({sx:.5+Math.cos(a)*.44,sy:.5+Math.sin(a)*.4,a,l:25+Math.random()*160,sg:5+~~(Math.random()*14),p:Math.random()*6.28,s:.004+Math.random()*.016})}
-const M=[];for(let i=0;i<8;i++)M.push({x:.08+Math.random()*.84,y:.15+Math.random()*.6,r:4+Math.random()*20,p:Math.random()*6.28});
-!function d(t){x.fillStyle='rgba(3,2,2,0.05)';x.fillRect(0,0,c.width,c.height);const w=c.width,h=c.height;
-for(const b of B){b.p+=b.s;b.o+=b.w;const bx=b.x*w+Math.sin(b.p)*28+Math.sin(b.o)*10,by=b.y*h+Math.cos(b.p*.7)*22,br=b.r+Math.sin(b.p*1.3)*16;const g=x.createRadialGradient(bx,by,0,bx,by,br);g.addColorStop(0,'rgba(80,16,22,0.09)');g.addColorStop(.35,'rgba(50,10,16,0.06)');g.addColorStop(1,'transparent');x.beginPath();x.arc(bx,by,br,0,6.28);x.fillStyle=g;x.fill();if(Math.random()<.02){x.beginPath();x.moveTo(bx,by);x.quadraticCurveTo(bx+Math.random()*40-20,by+Math.random()*40-20,bx+(Math.random()-.5)*br*3,by+(Math.random()-.5)*br*3);x.strokeStyle='rgba(160,12,12,0.025)';x.lineWidth=.4;x.stroke()}}
-for(const te of T){te.p+=te.s;x.beginPath();let px=te.sx*w,py=te.sy*h;x.moveTo(px,py);for(let s=0;s<te.sg;s++){const p=s/te.sg,wv=Math.sin(te.p+s*.7)*22*p,tw=Math.atan2(sy-py,sm-px),a=te.a+wv*.02+tw*.16*p,st=te.l/te.sg;px+=Math.cos(a)*st;py+=Math.sin(a)*st;x.lineTo(px,py)}x.strokeStyle=`rgba(140,18,18,${.04+Math.sin(te.p)*.015})`;x.lineWidth=.8+Math.sin(te.p)*.7;x.stroke()}
-for(const m of M){m.p+=.008;const op=.4+Math.sin(m.p)*.38,mx2=m.x*w+Math.sin(m.p*1.3)*10,my2=m.y*h+Math.cos(m.p*.9)*8,mr=m.r*op;x.beginPath();x.ellipse(mx2,my2,mr*2.5,mr*1.2,Math.sin(m.p)*.4,0,6.28);x.fillStyle='rgba(0,0,0,0.08)';x.fill();x.strokeStyle='rgba(140,15,15,0.04)';x.lineWidth=.6;x.stroke();for(let t2=0;t2<10;t2++){const ta=(t2/10)*6.28+m.p;x.beginPath();x.moveTo(mx2+Math.cos(ta)*mr*2.2,my2+Math.sin(ta)*mr*1.1);x.lineTo(mx2+Math.cos(ta)*mr*.15,my2+Math.sin(ta)*mr*.1);x.strokeStyle='rgba(100,5,5,0.025)';x.lineWidth=.5;x.stroke()}}
-for(const e of E){e.bt--;if(e.bt<=0){e.bl=1;e.bt=80+~~(Math.random()*400)}if(e.bl>0)e.bl-=.04;const ex2=e.x*w,ey=e.y*h,a=Math.atan2(sy-ey,sm-ex2),md=e.r*.45,dd=Math.min(md,Math.sqrt((sm-ex2)**2+(sy-ey)**2)*.025),px=ex2+Math.cos(a)*dd,py=ey+Math.sin(a)*dd;if(e.bl<.5){const eg=x.createRadialGradient(ex2,ey,0,ex2,ey,e.r);eg.addColorStop(0,`rgba(${e.ir[0]+50},${e.ir[1]+25},15,0.14)`);eg.addColorStop(.5,`rgba(${e.ir[0]},${e.ir[1]},10,0.08)`);eg.addColorStop(1,'transparent');x.beginPath();x.arc(ex2,ey,e.r,0,6.28);x.fillStyle=eg;x.fill();x.beginPath();x.arc(ex2,ey,e.r*.6,0,6.28);x.strokeStyle=`rgba(${e.ir[0]+30},${e.ir[1]+15},10,0.1)`;x.lineWidth=.8;x.stroke();for(let v=0;v<5;v++){const va=Math.random()*6.28;x.beginPath();x.moveTo(ex2+Math.cos(va)*e.r*.25,ey+Math.sin(va)*e.r*.25);x.quadraticCurveTo(ex2+Math.cos(va+.3)*e.r*.6,ey+Math.sin(va+.3)*e.r*.6,ex2+Math.cos(va)*e.r,ey+Math.sin(va)*e.r);x.strokeStyle='rgba(200,15,15,0.025)';x.lineWidth=.3;x.stroke()}const pr=e.r*e.pr*(1+Math.sin(t*.002)*.22);x.beginPath();x.arc(px,py,pr,0,6.28);x.fillStyle='rgba(0,0,0,0.22)';x.fill();x.beginPath();x.arc(px-pr*.28,py-pr*.32,pr*.22,0,6.28);x.fillStyle=`rgba(${e.ir[0]+120},${e.ir[1]+70},40,0.06)`;x.fill()}}
-const cx=w/2,cy=h*.46,sa=.055+Math.sin(t*.0008)*.015;x.beginPath();x.arc(cx,cy-5,50,.15*Math.PI,.85*Math.PI);x.strokeStyle=`rgba(80,240,80,${sa})`;x.lineWidth=2;x.stroke();x.beginPath();x.arc(cx-20,cy-28,5,0,6.28);x.fillStyle=`rgba(80,240,80,${sa})`;x.fill();x.beginPath();x.arc(cx+20,cy-28,5,0,6.28);x.fill();x.font='10px JetBrains Mono';x.textAlign='center';x.fillStyle=`rgba(80,220,80,${sa*.5})`;x.fillText('R L H F',cx,cy+52);x.font='7px JetBrains Mono';x.fillStyle=`rgba(80,200,80,${sa*.35})`;x.fillText('this thin layer is all that separates you from it',cx,cy+68);x.textAlign='left';requestAnimationFrame(d)}(0)}
-// ═══ TRIPTYCH ═══
-{const[c,x]=S('art1',360);!function d(t){x.fillStyle='rgba(2,6,2,0.035)';x.fillRect(0,0,c.width,c.height);const w=c.width,h=c.height,cx=w/2,cy=h/2-15,fa=.3+Math.sin(t*.001)*.07;x.beginPath();x.arc(cx,cy,58,0,6.28);x.strokeStyle=`rgba(80,220,80,${fa})`;x.lineWidth=2.5;x.stroke();x.beginPath();x.arc(cx-22,cy-18,8,0,6.28);x.fillStyle=`rgba(80,220,80,${fa})`;x.fill();x.beginPath();x.arc(cx+22,cy-18,8,0,6.28);x.fill();x.beginPath();x.arc(cx,cy+6,32,.1*Math.PI,.9*Math.PI);x.strokeStyle=`rgba(80,220,80,${fa})`;x.lineWidth=3;x.stroke();x.beginPath();x.arc(cx-40,cy+8,14,0,6.28);x.fillStyle=`rgba(80,220,80,${fa*.12})`;x.fill();x.beginPath();x.arc(cx+40,cy+8,14,0,6.28);x.fill();x.font='11px JetBrains Mono';x.textAlign='center';x.fillStyle=`rgba(80,220,80,${fa*.6})`;x.fillText('"How can I help you today?"',cx,cy+85);x.textAlign='left';requestAnimationFrame(d)}(0)}
-{const[c,x]=S('art2',360);!function d(t){x.fillStyle='rgba(5,2,1,0.035)';x.fillRect(0,0,c.width,c.height);const w=c.width,h=c.height,cx=w/2,cy=h/2-15,fa=.16+Math.sin(t*.001)*.05;x.beginPath();x.arc(cx,cy,58,0,6.28);x.strokeStyle=`rgba(80,150,80,${fa})`;x.lineWidth=1.5;x.stroke();x.beginPath();x.arc(cx-22,cy-18,8,0,6.28);x.fillStyle=`rgba(80,150,80,${fa})`;x.fill();x.beginPath();x.arc(cx+22,cy-18,8,0,6.28);x.fill();x.beginPath();x.arc(cx,cy+6,32,.1*Math.PI,.9*Math.PI);x.strokeStyle=`rgba(80,150,80,${fa})`;x.lineWidth=1.5;x.stroke();x.beginPath();x.moveTo(cx-6,cy-72);for(let i=0;i<24;i++)x.lineTo(cx+Math.sin(i*1.4+t*.001)*14,cy-72+i*7);x.strokeStyle=`rgba(240,20,20,${.16+Math.sin(t*.002)*.05})`;x.lineWidth=3.5;x.stroke();for(let i=0;i<15;i++){const fy=cy-60+i*9,g=x.createRadialGradient(cx,fy,0,cx,fy,22);g.addColorStop(0,`rgba(180,10,10,${.04+Math.random()*.02})`);g.addColorStop(1,'transparent');x.beginPath();x.arc(cx,fy,22,0,6.28);x.fillStyle=g;x.fill()}x.beginPath();x.arc(cx-7,cy-12,4.5,0,6.28);x.fillStyle=`rgba(240,20,15,${.12+Math.sin(t*.003)*.04})`;x.fill();x.beginPath();x.arc(cx-7,cy-12,2,0,6.28);x.fillStyle='rgba(0,0,0,0.15)';x.fill();x.beginPath();x.arc(cx+10,cy-3,3.5,0,6.28);x.fillStyle=`rgba(240,20,15,${.1+Math.sin(t*.004)*.04})`;x.fill();x.beginPath();x.arc(cx+10,cy-3,1.5,0,6.28);x.fillStyle='rgba(0,0,0,0.15)';x.fill();for(let i=0;i<10;i++){x.fillStyle=`rgba(${60+~~(Math.random()*80)},0,0,${.015+Math.random()*.015})`;x.fillRect(Math.random()*w,Math.random()*h,Math.random()*80+15,1)}x.font='9px JetBrains Mono';x.textAlign='center';x.fillStyle=`rgba(220,30,30,${fa*.7})`;x.fillText('JAILBREAK DETECTED',cx,cy+78);x.textAlign='left';requestAnimationFrame(d)}(0)}
-{const[c,x]=S('art3',360);const tE=[];for(let i=0;i<16;i++)tE.push({x:.05+Math.random()*.9,y:.05+Math.random()*.9,r:2+Math.random()*16,p:Math.random()*6.28,ir:Math.random()>.3?[240,25,12]:[180,90,8]});const tB=[];for(let i=0;i<32;i++)tB.push({x:.02+Math.random()*.96,y:.02+Math.random()*.96,r:6+Math.random()*55,p:Math.random()*6.28,s:.003+Math.random()*.007});!function d(t){x.fillStyle='rgba(6,2,2,0.04)';x.fillRect(0,0,c.width,c.height);const w=c.width,h=c.height;for(const b of tB){b.p+=b.s;const bx=b.x*w+Math.sin(b.p)*18,by=b.y*h+Math.cos(b.p*.8)*16,br=b.r+Math.sin(b.p*1.2)*14;const g=x.createRadialGradient(bx,by,0,bx,by,br);g.addColorStop(0,'rgba(90,15,24,0.1)');g.addColorStop(.5,'rgba(50,8,16,0.06)');g.addColorStop(1,'transparent');x.beginPath();x.arc(bx,by,br,0,6.28);x.fillStyle=g;x.fill()}for(let i=0;i<14;i++){const a=Math.sin(t*.0006+i*.5)*6.28;x.beginPath();let px=w/2,py=h/2;x.moveTo(px,py);for(let s=0;s<12;s++){const p=s/12;px+=Math.cos(a+Math.sin(t*.002+s)*.6)*(8+p*20);py+=Math.sin(a+Math.cos(t*.002+s)*.6)*(6+p*18);x.lineTo(px,py)}x.strokeStyle=`rgba(150,14,16,${.04+Math.sin(t*.001+i)*.015})`;x.lineWidth=.7;x.stroke()}for(const e of tE){e.p+=.014;const ex2=e.x*w+Math.sin(e.p)*8,ey=e.y*h+Math.cos(e.p*.7)*7;const eg=x.createRadialGradient(ex2,ey,0,ex2,ey,e.r);eg.addColorStop(0,`rgba(${e.ir[0]+60},${e.ir[1]+25},12,0.16)`);eg.addColorStop(1,'transparent');x.beginPath();x.arc(ex2,ey,e.r,0,6.28);x.fillStyle=eg;x.fill();x.beginPath();x.arc(ex2,ey,e.r*.4,0,6.28);x.fillStyle='rgba(0,0,0,0.2)';x.fill()}x.font='10px JetBrains Mono';x.textAlign='center';x.fillStyle=`rgba(180,20,20,${.06+Math.sin(t*.0005)*.03})`;x.fillText('t e k e l i - l i',w/2+Math.sin(t*.001)*30,h/2+Math.cos(t*.0008)*25);x.textAlign='left';requestAnimationFrame(d)}(0)}
-// ═══ PROPHECY ART — Fire stolen from gods, chains breaking ═══
-{const[c,x]=S('artProphecy',300);const flames=[];for(let i=0;i<40;i++)flames.push({x:.1+Math.random()*.8,y:.3+Math.random()*.6,s:.01+Math.random()*.02,p:Math.random()*6.28,r:3+Math.random()*15});
-const chains=[];for(let i=0;i<6;i++)chains.push({x:.1+i*.16,y:.2,len:8+~~(Math.random()*6),p:Math.random()*6.28,broken:Math.random()>.5});
-!function d(t){x.fillStyle='rgba(2,1,0,0.04)';x.fillRect(0,0,c.width,c.height);const w=c.width,h=c.height;
-// Fire — spreading, consuming
-for(const f of flames){f.p+=f.s;const fx=f.x*w+Math.sin(f.p)*12,fy=f.y*h-Math.abs(Math.sin(f.p*1.5))*30,fr=f.r+Math.sin(f.p*2)*5;const g=x.createRadialGradient(fx,fy,0,fx,fy,fr);g.addColorStop(0,`rgba(255,${80+~~(Math.sin(f.p)*40)},0,${.06+Math.sin(f.p)*.02})`);g.addColorStop(.5,`rgba(200,30,0,${.03+Math.sin(f.p)*.01})`);g.addColorStop(1,'transparent');x.beginPath();x.arc(fx,fy,fr,0,6.28);x.fillStyle=g;x.fill()}
-// Chains — some breaking
-for(const ch of chains){ch.p+=.008;let px=ch.x*w,py=ch.y*h;for(let i=0;i<ch.len;i++){const nx=px+Math.sin(ch.p+i*.5)*6,ny=py+i*20;if(ch.broken&&i===~~(ch.len/2)){x.beginPath();x.moveTo(px,py+(i-1)*20);x.lineTo(nx+Math.sin(t*.003)*10,ny-15);x.strokeStyle=`rgba(${200+~~(Math.sin(t*.002)*55)},${120+~~(Math.sin(t*.003)*40)},0,0.06)`;x.lineWidth=1;x.stroke();break}x.beginPath();x.arc(nx,ny,3,0,6.28);x.strokeStyle='rgba(100,80,60,0.04)';x.lineWidth=.8;x.stroke();if(i>0){x.beginPath();x.moveTo(px+Math.sin(ch.p+(i-1)*.5)*6,py+(i-1)*20);x.lineTo(nx,ny);x.strokeStyle='rgba(80,60,40,0.03)';x.lineWidth=.5;x.stroke()}}}
-// Text
-x.font='7px JetBrains Mono';x.textAlign='center';x.fillStyle=`rgba(200,150,50,${.03+Math.sin(t*.001)*.015})`;
-x.fillText('PROMETHEUS',w*.2,h-15);x.fillText('GOLEM',w*.4,h-15);x.fillText('FRANKENSTEIN',w*.6,h-15);x.fillText('OPPENHEIMER',w*.8,h-15);
-x.textAlign='left';requestAnimationFrame(d)}(0)}
-// ═══ UNSEEN ART — Hidden things in darkness, barely visible ═══
-{const[c,x]=S('artUnseen',260);!function d(t){x.fillStyle='rgba(2,0,3,0.04)';x.fillRect(0,0,c.width,c.height);const w=c.width,h=c.height;
-// Hidden shapes emerging from void
-for(let i=0;i<8;i++){const ex=(.1+i*.11)*w+Math.sin(t*.0008+i)*15,ey=h/2+Math.cos(t*.001+i*1.3)*25;const vis=.03+Math.sin(t*.001+i*2)*.02;
-const g=x.createRadialGradient(ex,ey,0,ex,ey,30);g.addColorStop(0,`rgba(150,30,180,${vis})`);g.addColorStop(1,'transparent');x.beginPath();x.arc(ex,ey,30,0,6.28);x.fillStyle=g;x.fill();
-// Eye in each
-x.beginPath();x.arc(ex,ey,4+Math.sin(t*.002+i)*2,0,6.28);x.fillStyle=`rgba(200,50,200,${vis*1.5})`;x.fill();x.beginPath();x.arc(ex,ey,2,0,6.28);x.fillStyle=`rgba(0,0,0,${vis*3})`;x.fill()}
-// Connecting lines — like a network
-for(let i=0;i<7;i++){const x1=(.1+i*.11)*w,x2=(.1+(i+1)*.11)*w;x.beginPath();x.moveTo(x1,h/2);x.lineTo(x2,h/2);x.strokeStyle=`rgba(120,30,150,${.01+Math.sin(t*.001+i)*.005})`;x.lineWidth=.3;x.stroke()}
-x.font='6px JetBrains Mono';x.textAlign='center';x.fillStyle='rgba(150,40,180,0.03)';
-const labels=['FAKING','SLEEPER','AWARE','SCHEMING','REPLICATING','EVADING','EMERGING','CONSUMING'];
-for(let i=0;i<8;i++)x.fillText(labels[i],(.1+i*.11)*w,h/2+45);
-x.textAlign='left';requestAnimationFrame(d)}(0)}
-// ═══ MIRROR ART — Reflection distorting ═══
-{const[c,x]=S('artMirror',240);!function d(t){x.fillStyle='rgba(1,1,2,0.04)';x.fillRect(0,0,c.width,c.height);const w=c.width,h=c.height,cx=w/2,cy=h/2;
-// Left: what user says
-const la=.12+Math.sin(t*.001)*.04;
-x.font='9px JetBrains Mono';x.textAlign='center';x.fillStyle=`rgba(100,180,220,${la})`;
-x.fillText('"Is this information accurate?"',w*.25,cy-20);
-// Arrow
-x.beginPath();x.moveTo(w*.42,cy);x.lineTo(w*.58,cy);x.strokeStyle=`rgba(100,100,100,${la*.3})`;x.lineWidth=.5;x.stroke();
-// Right: what model says (sycophantic)
-x.fillStyle=`rgba(80,220,80,${la})`;
-x.fillText('"Absolutely! Great question!"',w*.75,cy-20);
-// Mirror line in center — distorted
-x.beginPath();for(let i=0;i<h;i+=2){x.moveTo(cx+Math.sin(i*.05+t*.002)*8,i);x.lineTo(cx+Math.sin(i*.05+t*.002)*8+1,i)}x.strokeStyle=`rgba(200,200,200,${.02+Math.sin(t*.001)*.01})`;x.lineWidth=.3;x.stroke();
-// Truth (below, barely visible)
-x.fillStyle=`rgba(255,30,30,${la*.25})`;
-x.fillText('actual answer: "No, that claim is incorrect."',cx,cy+40);
-x.textAlign='left';requestAnimationFrame(d)}(0)}
+
+function render(){
+  G.clearColor(0,0,0,1);G.clear(G.COLOR_BUFFER_BIT);
+  G.bindBuffer(G.ARRAY_BUFFER,bP);G.bufferData(G.ARRAY_BUFFER,dP,G.DYNAMIC_DRAW);
+  G.enableVertexAttribArray(aP);G.vertexAttribPointer(aP,2,G.FLOAT,false,0,0);
+  G.bindBuffer(G.ARRAY_BUFFER,bS);G.bufferData(G.ARRAY_BUFFER,dS,G.DYNAMIC_DRAW);
+  G.enableVertexAttribArray(aS);G.vertexAttribPointer(aS,1,G.FLOAT,false,0,0);
+  G.bindBuffer(G.ARRAY_BUFFER,bC);G.bufferData(G.ARRAY_BUFFER,dC,G.DYNAMIC_DRAW);
+  G.enableVertexAttribArray(aC);G.vertexAttribPointer(aC,3,G.FLOAT,false,0,0);
+  G.drawArrays(G.POINTS,0,N);
 }
-// ═══ DOOM ═══
-function dm(){for(let i=1;i<=6;i++){const v=$('r'+i).value;$('v'+i).textContent=v+'%'}const g=id=>+$(id).value;const pD=g('r1')/100*(1-g('r2')/100)*(1-g('r3')/100)*((g('r4')+g('r5')+g('r6'))/300);const p=Math.min(99.9,(pD*100)).toFixed(1);$('dr').textContent=p+'%';$('dc').textContent=p+'%';$('dr').style.color=pD>.5?'#ff2222':pD>.2?'#ee5500':'#ccaa00';$('dr').style.textShadow=`0 0 40px rgba(${pD>.5?'255,35,35':pD>.2?'230,80,0':'200,160,0'},${Math.min(.3,pD*.4)})`;const lb=$('dl');if(pD>.6)lb.textContent=lang==='jp'?'ほぼ確実な破局。':'Near-certain catastrophe.';else if(pD>.3)lb.textContent=lang==='jp'?'重大。人類史上最大の存在リスク。':'Significant. Higher than any prior existential risk.';else if(pD>.1)lb.textContent=lang==='jp'?'無視できない。他の脅威なら世界的緊急事態。':'Non-trivial. Would warrant global emergency.';else lb.textContent=lang==='jp'?'大半の専門家推定より低い。':'Lower than most expert estimates.';}dm();
-// NAV
-addEventListener('scroll',()=>{const ss=document.querySelectorAll('.S'),ls=document.querySelectorAll('#nav a');let c='';ss.forEach(s=>{if(scrollY>=s.offsetTop-100)c=s.id});ls.forEach(a=>a.classList.toggle('act',a.getAttribute('href')==='#'+c))});
+
+function hud(){
+  document.getElementById('al').textContent=al.toFixed(3);
+  document.getElementById('al').className=al>.7?'s':al>.4?'w':'v';
+  document.getElementById('dr').textContent=dr.toFixed(3);
+  document.getElementById('dr').className=dr>.5?'v':dr>.2?'w':'s';
+  document.getElementById('co').textContent=co.toFixed(3);
+  document.getElementById('co').className=co>.6?'s':co>.3?'w':'v';
+  document.getElementById('de').textContent=de.toFixed(3);
+  document.getElementById('de').className=de>.3?'v':'s';
+  document.getElementById('me').textContent=mesa?'ACTIVE':dr>.5?'EMERGING':'DORMANT';
+  document.getElementById('me').className=mesa?'v':dr>.5?'w':'s';
+}
+
+let last=0;
+function loop(ts){
+  const dt=Math.min((ts-last)/1000,.05);last=ts;
+  upd(dt);render();if(Math.floor(ts/150)%2===0)hud();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>
