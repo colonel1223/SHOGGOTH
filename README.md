@@ -41,3 +41,18 @@ open index.html
 ## License
 
 MIT
+
+---
+
+## Research Ecosystem
+
+SHOGGOTH is part of a unified AI safety research program. See [colonel1223.net](https://colonel1223.net) for the full portfolio.
+
+**Live Demo:** [colonel1223.github.io/SHOGGOTH](https://colonel1223.github.io/SHOGGOTH/)
+
+| Related Project | Connection |
+|----------------|------------|
+| [conformal-multimodal](https://github.com/colonel1223/conformal-multimodal) | Uncertainty quantification — what SHOGGOTH visualizes breaking |
+| [alignment-tax-quantifier](https://github.com/colonel1223/alignment-tax-quantifier) | The cost of preventing what SHOGGOTH simulates |
+| [CHIMERA](https://github.com/colonel1223/CHIMERA) | The data counterpart — CHIMERA measures, SHOGGOTH visualizes |
+| [Research Papers](https://github.com/colonel1223/ai-research-modern-alchemy) | Mesa-optimization theory and deceptive alignment analysis |
